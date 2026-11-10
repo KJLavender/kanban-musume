@@ -36,6 +36,7 @@ export async function activate(context: vscode.ExtensionContext) {
     onSnapshot: (s) => {
       snapshot = s;
       view.post({ type: "snapshot", snapshot: s });
+      if (s.permission) void askInNotification(s.permission);
     },
     createRunner: ({ emit, ask }) => {
       const folder = vscode.workspace.workspaceFolders?.[0];
@@ -46,6 +47,21 @@ export async function activate(context: vscode.ExtensionContext) {
       return new AcpSource({ agent, cwd, stateDir: join(petHome(), "acpx", "vscode"), emit, ask });
     },
   });
+
+  // With the sidebar hidden (character in the editor), the permission sign
+  // becomes a notification with the same two buttons.
+  let asked: string | null = null;
+  async function askInNotification(p: NonNullable<PetSnapshot["permission"]>) {
+    if (!overlay.on || asked === p.id) return;
+    asked = p.id;
+    const choice = await vscode.window.showWarningMessage(
+      `ACP Pet:agent 想${p.title}${p.detail ? `
+${p.detail}` : ""},可以嗎?`,
+      "准",
+      "不准",
+    );
+    controller.answer(p.id, choice === "准" ? "allow" : "reject");
+  }
 
   // ── characters ─────────────────────────────────────────────────────────
 
@@ -84,6 +100,8 @@ export async function activate(context: vscode.ExtensionContext) {
   }, 15_000);
 
   // ── view ───────────────────────────────────────────────────────────────
+
+  const overlay = registerOverlayCommands(context, dirs, log);
 
   const view = new PetViewProvider(context.extensionUri, {
     ready: () => {
@@ -155,7 +173,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("acpPet.cancel", () => controller.cancel()),
     vscode.commands.registerCommand("acpPet.next", () => next()),
     vscode.commands.registerCommand("acpPet.pick", pick),
-    registerOverlayCommands(context, dirs, log),
+    overlay,
     watchEditor(mirror, () => cfg().get<boolean>("reactToEditor", true)),
     {
       dispose: () => {

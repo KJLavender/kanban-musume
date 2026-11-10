@@ -54,6 +54,9 @@ const CSS = `
 #acp-pet img { pointer-events: auto; cursor: grab; user-select: none; -webkit-user-drag: none;
   transform-origin: 50% 100%; animation: acp-breathe 3.2s ease-in-out infinite; filter: drop-shadow(0 3px 6px rgba(0,0,0,.35)); }
 #acp-pet.dragging img { cursor: grabbing; animation: none; }
+#acp-pet .acp-body { display: block; line-height: 0; }
+#acp-pet .acp-body.flip { transform: scaleX(-1); }
+#acp-pet.walking img { animation: acp-walk .34s ease-in-out infinite alternate; }
 #acp-pet.pose-happy img, #acp-pet.pose-levelup img { animation: acp-hop .36s ease-in-out 4 alternate; }
 #acp-pet.pose-typing img { animation: acp-jitter .14s steps(2) infinite; }
 #acp-pet.pose-sulking img { animation: acp-shake .5s ease-in-out 2; }
@@ -61,6 +64,7 @@ const CSS = `
 @keyframes acp-breathe { 0%,100% { transform: scale(1, 1); } 50% { transform: scale(1.01, 1.025); } }
 @keyframes acp-hop { from { transform: translateY(0); } to { transform: translateY(-14px); } }
 @keyframes acp-jitter { from { transform: translateX(-1px); } to { transform: translateX(1px); } }
+@keyframes acp-walk { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-5px) rotate(2deg); } }
 @keyframes acp-shake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
 `;
 
@@ -84,7 +88,11 @@ function start(cfg: OverlayConfig) {
   img.alt = "";
   img.draggable = false;
   img.style.height = `${cfg.height}px`;
-  wrap.append(bubble, img);
+  // The body flips to face where she walks; the bubble stays readable.
+  const body = document.createElement("span");
+  body.className = "acp-body";
+  body.append(img);
+  wrap.append(bubble, body);
   document.body.append(bg, wrap);
   // Move into the workbench once it exists: there, notifications, menus and the
   // command palette stack above the pet instead of being covered by it.
@@ -121,6 +129,7 @@ function start(cfg: OverlayConfig) {
   const asleep = () => pose === "sleeping";
 
   function setPose(next: PetState, holdMs = 0) {
+    if (next !== "idle") stopWalk();
     clearTimeout(poseTimer);
     pose = next;
     img.src = url(char.frames[next]);
@@ -159,6 +168,50 @@ function start(cfg: OverlayConfig) {
     }, 650);
   }
 
+  // ── strolling along the bottom edge of the window ──
+
+  /** Within this distance of the bottom she counts as standing on the edge (and may stroll). */
+  const EDGE = 48;
+  let walk: ReturnType<typeof setInterval> | null = null;
+  let hovering = false;
+  const currentRight = () => parseFloat(wrap.style.right) || 0;
+  const currentBottom = () => parseFloat(wrap.style.bottom) || 0;
+
+  function stopWalk() {
+    if (!walk) return;
+    clearInterval(walk);
+    walk = null;
+    wrap.classList.remove("walking");
+    save({ right: currentRight(), bottom: currentBottom() });
+  }
+
+  /** Walk sideways to a new distance from the right edge, about 70px a second. */
+  function strollTo(target: number) {
+    stopWalk();
+    const max = window.innerWidth - img.getBoundingClientRect().width - 8;
+    const goal = Math.max(8, Math.min(max, target));
+    const dir = Math.sign(goal - currentRight());
+    if (!dir) return;
+    body.classList.toggle("flip", dir < 0); // moving right on screen: face right
+    wrap.classList.add("walking");
+    walk = setInterval(() => {
+      const next = currentRight() + dir * 2;
+      if ((dir > 0 && next >= goal) || (dir < 0 && next <= goal)) {
+        place(goal, currentBottom());
+        stopWalk();
+        return;
+      }
+      place(next, currentBottom());
+    }, 30);
+  }
+
+  function maybeStroll() {
+    if (walk || press || hovering || pose !== "idle" || currentBottom() > EDGE) return;
+    if (Math.random() > 0.3) return;
+    const step = (120 + Math.random() * 380) * (Math.random() < 0.5 ? -1 : 1);
+    strollTo(currentRight() + step);
+  }
+
   function wake() {
     setPose("idle");
     say("唔…早安~");
@@ -183,6 +236,7 @@ function start(cfg: OverlayConfig) {
   img.addEventListener("mousedown", (e) => {
     if (e.button !== 0) return;
     e.preventDefault();
+    stopWalk();
     const r = wrap.getBoundingClientRect();
     press = { x: e.clientX, y: e.clientY, right: window.innerWidth - r.right, bottom: window.innerHeight - r.bottom, moved: false };
   });
@@ -219,7 +273,10 @@ function start(cfg: OverlayConfig) {
   });
 
   let lastGreet = 0;
+  img.addEventListener("mouseleave", () => (hovering = false));
   img.addEventListener("mouseenter", () => {
+    hovering = true;
+    stopWalk();
     const now = Date.now();
     if (asleep() || now - lastGreet < 30_000 || Math.random() > 0.5) return;
     lastGreet = now;
@@ -256,6 +313,7 @@ function start(cfg: OverlayConfig) {
       say(pick(char.mumbles));
     }
     if (cfg.rotateMinutes > 0 && now - switchedAt >= cfg.rotateMinutes * 60_000 && !press) nextCharacter();
+    else maybeStroll();
   }, 5000);
 
   window.addEventListener("resize", () => {

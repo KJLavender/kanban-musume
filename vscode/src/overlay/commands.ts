@@ -12,12 +12,23 @@ import { findWorkbench, isPatched, patch, unpatch } from "./patch.js";
 const WANTED = "acpPet.overlayWanted";
 const cfg = () => vscode.workspace.getConfiguration("acpPet");
 
+export type OverlayControl = vscode.Disposable & {
+  /** The character is in the editor right now (installed and loaded in this window). */
+  readonly on: boolean;
+};
+
 export function registerOverlayCommands(
   context: vscode.ExtensionContext,
   skinDirs: string[],
   log: (m: string) => void,
-): vscode.Disposable {
+): OverlayControl {
   const inst = () => findWorkbench(vscode.env.appRoot);
+  let on = false;
+  // While she's in the editor, the sidebar panel is hidden (package.json: when !acpPet.overlayOn).
+  const setOn = (value: boolean) => {
+    on = value;
+    void vscode.commands.executeCommand("setContext", "acpPet.overlayOn", value);
+  };
 
   async function reloadPrompt(message: string) {
     const choice = await vscode.window.showInformationMessage(message, "重新載入視窗");
@@ -78,7 +89,9 @@ export function registerOverlayCommands(
   // After a VS Code update the patch is gone; offer to put it back.
   void (async () => {
     try {
-      if (context.globalState.get<boolean>(WANTED) && !(await isPatched(inst()))) {
+      const patched = await isPatched(inst());
+      setOn(patched);
+      if (context.globalState.get<boolean>(WANTED) && !patched) {
         const choice = await vscode.window.showInformationMessage("ACP Pet:VS Code 更新後,編輯器裡的角色不見了。要放回去嗎?", "放回去");
         if (choice) await apply(false);
       }
@@ -95,9 +108,15 @@ export function registerOverlayCommands(
     if (choice) await apply(false);
   });
 
-  return vscode.Disposable.from(
+  const disposable = vscode.Disposable.from(
     vscode.commands.registerCommand("acpPet.overlay.install", () => apply(true)),
     vscode.commands.registerCommand("acpPet.overlay.remove", remove),
     watch,
   );
+  return {
+    get on() {
+      return on;
+    },
+    dispose: () => disposable.dispose(),
+  };
 }

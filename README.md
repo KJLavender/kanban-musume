@@ -169,7 +169,8 @@ That opens a second VS Code window with the extension loaded. Settings (search f
 Like [doki-theme](https://github.com/doki-theme/doki-theme-vscode), the extension can also put the character right in the editor: she stands in the bottom-right corner over a faded background illustration. Run "ACP Pet: 把角色放進編輯器" from the Command Palette and reload the window.
 
 - She breathes, types along while you type, and reacts when you click her (pat her head, poke her cheek; five clicks in a few seconds and she sulks).
-- Drag her anywhere; she remembers the spot. Right-click her for the next character.
+- She strolls back and forth along the bottom edge of the window. Drag her anywhere; she remembers the spot (dragged off the bottom edge, she stays put). Right-click her for the next character.
+- While she's in the editor, the sidebar panel is hidden, and when the agent asks for permission you get a VS Code notification with 准 / 不准 instead.
 - She falls asleep after 10 minutes without keyboard or mouse, and wakes up when you come back. Now and then she mumbles to herself.
 - Every few minutes (`acpPet.rotateMinutes`) the next character takes over, and the background changes with her.
 

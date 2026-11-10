@@ -28,7 +28,8 @@
         {
           "type": "webview",
           "id": "acpPet.view",
-          "name": "ACP Pet"
+          "name": "ACP Pet",
+          "when": "!acpPet.overlayOn"
         }
       ]
     },
