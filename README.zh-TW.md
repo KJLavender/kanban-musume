@@ -173,7 +173,7 @@ code --extensionDevelopmentPath="$PWD/vscode"
 - 10 分鐘沒碰鍵盤滑鼠她會睡著,你回來就會醒。偶爾會自言自語。
 - 每隔幾分鐘(`acpPet.rotateMinutes`)換下一個角色,背景也跟著換。
 
-只會用圖片角色(內附的 DeepSeek娘、芙蘭朵露、蕾米莉亞,以及 `~/.acp-pet/skins` 裡的資料夾,例如你自己的 `hikari-art`)。背景圖從 `~/.acp-pet/backgrounds/<id>.jpg`(或 `.png`、`.webp`)讀取,不會被放進這個 repo。`acpPet.editor.backgroundOpacity` 調背景的明顯程度(預設 0.12,0 就是不顯示),`acpPet.editor.height` 調角色大小。
+只會用圖片角色(內附的 DeepSeek娘、芙蘭朵露、蕾米莉亞,以及 `~/.acp-pet/skins` 裡的資料夾,例如你自己的 `hikari-art`)。背景圖從 `~/.acp-pet/backgrounds/<id>.png`(或 `.webp`、`.jpg`)讀取,不會被放進這個 repo。請用去背、背景透明的圖,跟 doki-theme 一樣;`python scripts/pets/cut_background.py art.jpg deepseek` 可以把純白的底去掉(黑底加 `--backdrop black`)。`acpPet.editor.backgroundOpacity` 調背景的明顯程度(預設 0.12,0 就是不顯示),`acpPet.editor.height` 調角色大小。
 
 做法是改 VS Code 自己的一個檔案(`workbench.html`):加一行 script 和旁邊一個放圖片的資料夾,並更新 `product.json` 裡這個檔案的檢查碼,這樣 VS Code 就不會說安裝已損毀。VS Code 更新後這個修改會消失,擴充套件會發現並問你要不要放回去。想還原,請在解除安裝擴充套件之前執行「ACP Pet: 把角色從編輯器移除」。
 

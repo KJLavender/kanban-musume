@@ -64,7 +64,7 @@ describe("building the overlay folder", () => {
   it("collects picture skins with fallbacks, skips sprite-sheet packs and missing ones", async () => {
     const out = await mkdtemp(join(tmpdir(), "acp-pet-overlay-"));
     const bgs = await mkdtemp(join(tmpdir(), "acp-pet-bg-"));
-    await writeFile(join(bgs, "flandre.jpg"), "fake jpg");
+    await writeFile(join(bgs, "flandre.png"), "fake png");
     const cfg = await buildOverlay(out, {
       ids: ["flandre", "hikari", "nobody"],
       skinDirs: [join(__dirname, "..", "pets")],
@@ -79,7 +79,7 @@ describe("building the overlay folder", () => {
     const f = cfg.characters[0]!;
     expect(f.frames.idle).toBe("flandre/idle.png");
     expect(f.frames.levelup).toBe("flandre/levelup.png");
-    expect(f.background).toBe("flandre/background.jpg");
+    expect(f.background).toBe("flandre/background.png");
     expect(f.mumbles.length).toBeGreaterThan(0);
     for (const path of Object.values(f.frames)) expect(existsSync(join(out, path))).toBe(true);
     const js = await readFile(join(out, "overlay.js"), "utf8");

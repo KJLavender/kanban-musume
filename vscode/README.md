@@ -17,7 +17,7 @@ Characters: Hikari and Nozomi (Blue Archive), DeepSeek-tan, Flandre and Remilia 
 
 ## The character in the editor
 
-Run "ACP Pet: 把角色放進編輯器" and reload the window: the character stands in the bottom-right corner of the editor over a faded background illustration, like doki-theme. Click her, drag her, right-click for the next one. She types along with you, falls asleep when you're away, and the characters take turns every few minutes. Backgrounds come from `~/.acp-pet/backgrounds/<id>.jpg`.
+Run "ACP Pet: 把角色放進編輯器" and reload the window: the character stands in the bottom-right corner of the editor over a faded background illustration, like doki-theme. Click her, drag her, right-click for the next one. She types along with you, falls asleep when you're away, and the characters take turns every few minutes. Backgrounds are cut-out pictures in `~/.acp-pet/backgrounds/<id>.png`.
 
 This changes VS Code's `workbench.html` (and its checksum, so there's no "corrupt" warning). Run "ACP Pet: 把角色從編輯器移除" before uninstalling. After a VS Code update the extension offers to put it back.
 

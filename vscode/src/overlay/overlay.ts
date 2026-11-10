@@ -41,9 +41,8 @@ function save(patch: Saved) {
 const pick = <T>(xs: readonly T[]): T => xs[Math.floor(Math.random() * xs.length)]!;
 
 const CSS = `
-#acp-pet-bg { position: fixed; right: 0; top: 0; height: 100%; max-width: 100%; object-fit: contain;
-  object-position: right center; pointer-events: none; z-index: 20; transition: opacity 1.2s ease;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 35%); mask-image: linear-gradient(to right, transparent, #000 35%); }
+#acp-pet-bg { position: fixed; right: 0; bottom: 0; height: 92%; max-width: 70%; object-fit: contain;
+  object-position: right bottom; pointer-events: none; z-index: 20; transition: opacity 1.2s ease; }
 #acp-pet { position: fixed; z-index: 21; pointer-events: none; display: flex; flex-direction: column;
   align-items: flex-end; transition: opacity 0.6s ease; }
 #acp-pet.fading { opacity: 0; }
@@ -73,8 +72,7 @@ function start(cfg: OverlayConfig) {
   style.textContent = CSS;
   document.head.appendChild(style);
 
-  // An <img>, not a CSS background, so its own left edge can fade out (no hard
-  // box where a white-backed illustration ends).
+  // The illustration is a cut-out (transparent PNG), standing in the bottom-right like doki-theme's wallpapers.
   const bg = document.createElement("img");
   bg.id = "acp-pet-bg";
   bg.alt = "";

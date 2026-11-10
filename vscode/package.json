@@ -108,7 +108,7 @@
           "default": 0.12,
           "minimum": 0,
           "maximum": 1,
-          "description": "How strongly the character's background illustration (~/.acp-pet/backgrounds/<id>.jpg) shows over the editor. 0 hides it."
+          "description": "How strongly the character's background illustration (~/.acp-pet/backgrounds/<id>.png) shows over the editor. 0 hides it."
         },
         "acpPet.editor.height": {
           "type": "number",
