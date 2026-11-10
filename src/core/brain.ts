@@ -17,6 +17,9 @@ import {
   levelUpLine,
   lineFor,
   petLine,
+  touchLine,
+  annoyedLine,
+  type TouchZone,
   planLine,
   raceLoseLine,
   raceWinLine,
@@ -62,6 +65,9 @@ export const xpToNext = (level: number) => level * 50;
 export const RACE_WIN_XP = 15;
 
 const REACTIONS: ReadonlySet<PetState> = new Set(["happy", "sick", "sulking", "levelup"]);
+/** This many clicks within POKE_WINDOW_MS and the pet gets annoyed. */
+const POKES_TO_ANNOY = 5;
+const POKE_WINDOW_MS = 4000;
 const RESTING: ReadonlySet<PetState> = new Set(["idle", "bored", "sleeping"]);
 
 /** The heart of the project: which animation a tool call becomes. */
@@ -237,10 +243,21 @@ export class PetBrain {
     }
   }
 
-  interact(action: "pet" | "sleep" | "wake", now: number): void {
+  /** Recent touch times, to notice being poked over and over. */
+  private touches: number[] = [];
+
+  interact(action: "pet" | "sleep" | "wake", now: number, zone?: TouchZone): void {
     if (action === "pet") {
-      this.needs.mood = clamp(this.needs.mood + 3);
-      if (!this.busy) this.go("happy", petLine(this.rng), now, true);
+      this.touches = [...this.touches.filter((t) => now - t < POKE_WINDOW_MS), now];
+      if (this.touches.length >= POKES_TO_ANNOY) {
+        // Poked too many times in a row: sulk for a bit.
+        this.touches = [];
+        this.needs.mood = clamp(this.needs.mood - 2);
+        if (!this.busy) this.go("sulking", annoyedLine(this.rng), now, true);
+        return;
+      }
+      this.needs.mood = clamp(this.needs.mood + (zone === "cheek" ? 1 : 3));
+      if (!this.busy) this.go("happy", zone ? touchLine(zone, this.rng) : petLine(this.rng), now, true);
     } else if (action === "sleep") {
       if (!this.busy) this.go("sleeping", lineFor("sleeping", this.rng), now, true);
     } else if (this.state === "sleeping") {

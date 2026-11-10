@@ -2,7 +2,14 @@
 // idle pets should do, then do it with real windows.
 
 import { screen } from "electron";
-import { chatDistance, chatLines, planAmbient, type AmbientAction, type AmbientPet } from "../core/ambient.js";
+import {
+  chatDistance,
+  chatLines,
+  planAmbient,
+  type AmbientAction,
+  type AmbientContext,
+  type AmbientPet,
+} from "../core/ambient.js";
 import type { PetWindow } from "./pet-window.js";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -26,6 +33,7 @@ export function describePets(pets: PetWindow[]): AmbientPet[] {
       free: p.isFree(),
       cursorOver: over,
       cursorNear: near,
+      skin: p.skin.id,
     };
   });
 }
@@ -45,7 +53,7 @@ export async function perform(pets: PetWindow[], action: AmbientAction): Promise
       // Arrived next to the other one (and nothing interrupted): have a chat.
       const [a, b] = describePets([pet, other]);
       if (pet.isFree() && other.isFree() && Math.abs(a!.x - b!.x) <= chatDistance(a!, b!)) {
-        await chat(pet, other, chatLines(pet.profile.name, other.profile.name, Math.random));
+        await chat(pet, other, chatLines(speaker(pet), speaker(other), Math.random));
       }
       return;
     }
@@ -65,6 +73,8 @@ export async function perform(pets: PetWindow[], action: AmbientAction): Promise
   }
 }
 
+const speaker = (p: PetWindow) => ({ name: p.profile.name, skin: p.skin.id });
+
 async function chat(a: PetWindow, b: PetWindow, [first, reply]: [string, string]) {
   const ax = a.win.getBounds().x;
   const bx = b.win.getBounds().x;
@@ -78,14 +88,19 @@ async function chat(a: PetWindow, b: PetWindow, [first, reply]: [string, string]
 export type AmbientLoop = { stop(): void };
 
 /** Ticks every 6–14 s; one scene at a time so pets don't trample each other. */
-export function startAmbient(getPets: () => PetWindow[], enabled: () => boolean, log: (m: string) => void): AmbientLoop {
+export function startAmbient(
+  getPets: () => PetWindow[],
+  enabled: () => boolean,
+  log: (m: string) => void,
+  context: () => AmbientContext = () => ({}),
+): AmbientLoop {
   let busy = false;
   let timer: ReturnType<typeof setTimeout>;
   const tick = async () => {
     try {
       const pets = getPets();
       if (enabled() && !busy && pets.length) {
-        const action = planAmbient(describePets(pets), Math.random);
+        const action = planAmbient(describePets(pets), Math.random, context());
         if (action) {
           busy = true;
           log(`ambient: ${action.kind}${"line" in action ? ` "${action.line}"` : ""}`);

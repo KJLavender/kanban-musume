@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { listSkins, loadSkin } from "../src/core/skins";
+import { listSkins, loadSkin } from "../src/core/skins.js";
 
 const PETS = resolve(__dirname, "../pets");
 

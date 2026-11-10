@@ -34,6 +34,15 @@ export const levelUpLine = (level: number) => `我升級啦!Lv.${level} 🎉`;
 export const planLine = (steps: number) => `列好計畫了,${steps} 步`;
 export const toolFailedLine = (title: string) => `唔,「${title}」失敗了`;
 export const petLine = (rng: Rng) => pick(["嘿嘿 ♥", "再摸一下嘛", "呼嚕呼嚕~"], rng);
+/** Where on the pet a click landed. */
+export type TouchZone = "head" | "cheek" | "body";
+const TOUCH_LINES: Record<TouchZone, readonly string[]> = {
+  head: ["摸頭!嘿嘿 ♥", "再摸一下嘛~", "頭髮會亂掉啦…不過可以", "呼嚕呼嚕~"],
+  cheek: ["唔…不要戳臉啦", "臉頰不是按鈕!", "(鼓起臉頰)", "戳什麼戳~"],
+  body: ["好癢~", "嗯?怎麼了?", "要給我任務嗎?", "抓到了!"],
+};
+export const touchLine = (zone: TouchZone, rng: Rng) => pick(TOUCH_LINES[zone], rng);
+export const annoyedLine = (rng: Rng) => pick(["再戳我要生氣了!", "夠了啦!😤", "哼,不理你了"], rng);
 export const tiredLine = "好累…想睡覺 🥱";
 export const raceWinLine = "第一名!🏆 我最快";
 export const raceLoseLine = (place: number, total: number) => `第 ${place}/${total} 名…下次一定贏`;

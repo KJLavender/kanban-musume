@@ -2,14 +2,14 @@
 // each step into smoke-out/, and exits 1 if any check fails.
 // Runs against a temp ACP_PET_HOME, never your real save.
 
-import { app, nativeImage } from "electron";
+import { app, nativeImage, screen } from "electron";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { PetEvent } from "../core/events.js";
 import { CODEX_ATLAS } from "../core/skins.js";
 import { skinsDir } from "./config.js";
 import { perform } from "./ambient-driver.js";
-import { addPet, log, pets, startRace, updateSettings } from "./main.js";
+import { addPet, config, log, pets, startRace, updateSettings } from "./main.js";
 import { WIN_H, WIN_W, type PetWindow } from "./pet-window.js";
 
 const outDir = join(process.cwd(), "smoke-out");
@@ -339,6 +339,33 @@ async function scenarioAmbient() {
   a.controller.brain.resolvePermission("amb", "allow", Date.now());
 }
 
+async function scenarioGameMode(pet: PetWindow) {
+  // Game mode parks the pet in a real screen corner; keep it invisible meanwhile.
+  pet.win.setOpacity(0);
+  const before = pet.win.getBounds();
+  await updateSettings({ gameMode: true });
+  pet.enterGameMode(config);
+  await sleep(300);
+  const small = pet.win.getBounds();
+  const zoom = pet.win.webContents.getZoomFactor();
+  const area = screen.getDisplayMatching(small).workArea;
+  check(
+    "game mode: shrinks to half size in the bottom corner",
+    small.width === Math.round(before.width / 2) && zoom === 0.5 && small.y + small.height === area.y + area.height,
+    `${before.width}×${before.height} → ${small.width}×${small.height} @${small.x},${small.y} zoom ${zoom}`,
+  );
+  check("game mode: the pet keeps still (not free to wander)", !pet.isFree(Date.now() + 120_000));
+  pet.exitGameMode(config);
+  await sleep(300);
+  const back = pet.win.getBounds();
+  pet.win.setOpacity(1);
+  check(
+    "game mode: leaving it restores size and place",
+    back.x === before.x && back.y === before.y && back.width === before.width && back.height === before.height,
+    `${back.width}×${back.height} @${back.x},${back.y}`,
+  );
+}
+
 export async function runSmoke() {
   await mkdir(outDir, { recursive: true });
   const pet = pets[0]!;
@@ -353,6 +380,7 @@ export async function runSmoke() {
     ["relay", () => scenarioRelay(pet)],
     ["race", () => scenarioRace()],
     ["ambient", () => scenarioAmbient()],
+    ["game mode", () => scenarioGameMode(pet)],
   ];
   for (const [name, run] of scenarios) {
     log(`── scenario: ${name}`);

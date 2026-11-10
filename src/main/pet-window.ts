@@ -147,7 +147,8 @@ export class PetWindow {
     const volume = process.argv.includes("--smoke") ? 0 : 1;
     // Name tags only matter once there's more than one pet on screen.
     const name = config.pets.length > 1 ? this.profile.name : "";
-    this.send("pet:settings", { tts: config.tts, voice: this.index, name, volume });
+    // Quiet while a game is running.
+    this.send("pet:settings", { tts: config.tts && !this.gameRestore, voice: this.index, name, volume });
   }
 
   async setSkin(id: string, log: (m: string) => void) {
@@ -157,13 +158,14 @@ export class PetWindow {
   }
 
   applySettings(config: PetConfig) {
-    const w = Math.round(WIN_W * config.scale);
-    const h = Math.round(WIN_H * config.scale);
+    const scale = config.scale * (this.gameRestore ? PetWindow.GAME_SCALE : 1);
+    const w = Math.round(WIN_W * scale);
+    const h = Math.round(WIN_H * scale);
     // Non-resizable windows ignore setSize on some platforms; open it up briefly.
     this.win.setResizable(true);
     this.win.setSize(w, h);
     this.win.setResizable(false);
-    this.win.webContents.setZoomFactor(config.scale);
+    this.win.webContents.setZoomFactor(scale);
     this.win.setAlwaysOnTop(config.alwaysOnTop, "screen-saver");
     this.sendSettings(config);
   }
@@ -195,8 +197,9 @@ export class PetWindow {
 
   async persist() {
     if (!this.win.isDestroyed()) {
+      // In game mode the window sits shrunk in a corner; remember where it really lives.
       const [x, y] = this.win.getPosition();
-      this.controller.setWindow({ x: x!, y: y! });
+      this.controller.setWindow(this.gameRestore ?? { x: x!, y: y! });
     }
     await this.controller.persist();
   }
@@ -243,6 +246,7 @@ export class PetWindow {
       (s.state === "idle" || s.state === "bored") &&
       !this.drag &&
       !this.walk &&
+      !this.gameRestore &&
       now - this.placedAt > PetWindow.STAY_AFTER_DRAG_MS
     );
   }
@@ -279,6 +283,37 @@ export class PetWindow {
     this.send("pet:walk", 0);
     void this.persist();
     done();
+  }
+
+  // ── game mode: small, still and quiet while a full-screen game runs ──
+
+  static readonly GAME_SCALE = 0.5;
+  /** Where the window was before game mode; null when not in game mode. */
+  private gameRestore: { x: number; y: number } | null = null;
+
+  get inGameMode(): boolean {
+    return this.gameRestore !== null;
+  }
+
+  enterGameMode(config: PetConfig) {
+    if (this.gameRestore || this.win.isDestroyed()) return;
+    this.stopWalking();
+    const [x, y] = this.win.getPosition();
+    const area = screen.getDisplayMatching(this.win.getBounds()).workArea;
+    this.gameRestore = { x: x!, y: y! };
+    this.applySettings(config);
+    // Line up along the bottom-right corner of the screen the pet was on.
+    const [w, h] = this.win.getSize();
+    const cx = area.x + area.width - (w! + 8) * (this.index + 1);
+    this.win.setPosition(Math.max(area.x, cx), area.y + area.height - h!);
+  }
+
+  exitGameMode(config: PetConfig) {
+    const back = this.gameRestore;
+    if (!back || this.win.isDestroyed()) return;
+    this.gameRestore = null;
+    this.applySettings(config);
+    this.win.setPosition(back.x, back.y);
   }
 
   /** -1 = turn to face left, 1 = right. */

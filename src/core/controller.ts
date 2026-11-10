@@ -2,6 +2,7 @@
 // Electron-free, so the whole "feed a task → pet acts it out → save" loop
 // can be tested in plain Node.
 
+import type { TouchZone } from "./lines.js";
 import { PetBrain, type BrainOptions } from "./brain.js";
 import type { DiaryEntry, PermissionDecision, PetEvent, PetSnapshot, ToolKind, TurnOutcome } from "./events.js";
 import { demoScript, failingScript, runScript } from "./fake-source.js";
@@ -156,8 +157,8 @@ export class PetController {
     this.gate.answer(id, decision);
   }
 
-  interact(action: "pet" | "sleep" | "wake"): void {
-    this.brain.interact(action, this.now());
+  interact(action: "pet" | "sleep" | "wake", zone?: TouchZone): void {
+    this.brain.interact(action, this.now(), zone);
     this.tick();
   }
 

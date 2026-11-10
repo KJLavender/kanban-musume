@@ -28,6 +28,10 @@ export type PetConfig = {
   tts: boolean;
   /** Idle pets stroll around, chat with each other and greet you. */
   wander: boolean;
+  /** Shrink into a corner and keep still while a full-screen game runs (Windows). */
+  gameMode: boolean;
+  /** Extra games to watch for by process name, e.g. "Genshin.exe" (for borderless-window games). */
+  gameProcesses: string[];
 };
 
 export const SCALES = [0.75, 1, 1.25, 1.5, 2] as const;
@@ -67,6 +71,8 @@ const defaults = (): PetConfig => ({
   alwaysOnTop: true,
   tts: false,
   wander: true,
+  gameMode: true,
+  gameProcesses: [],
 });
 
 /** Accepts the v0.1 single-pet shape ({ agent, workspace }) too. */
@@ -88,6 +94,8 @@ export function normalizeConfig(raw: Record<string, unknown>): PetConfig {
     alwaysOnTop: raw.alwaysOnTop !== false,
     tts: raw.tts === true,
     wander: raw.wander !== false,
+    gameMode: raw.gameMode !== false,
+    gameProcesses: Array.isArray(raw.gameProcesses) ? raw.gameProcesses.filter((g): g is string => typeof g === "string") : [],
   };
 }
 

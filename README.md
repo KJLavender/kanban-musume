@@ -51,7 +51,7 @@ Both commands build the app first, then open it with Electron.
 
 Controls:
 
-- Click the pet to pet it. Double-click to open the task box. Drag to move it.
+- Click the pet to pet it. Where you click matters: a pat on the head makes it happy, a poke on the cheek gets a pout, and five clicks in a few seconds make it sulk. Double-click to open the task box. Drag to move it.
 - Right-click the pet, or click the tray icon, for the menu.
 
 What you can type in the task box:
@@ -88,7 +88,8 @@ These are picture skins, not sprite sheets: one PNG per pose in `pets/<id>/`, so
 ```bash
 python scripts/pets/import_sheet.py scripts/pets/sheets/flandre-main.jpg flandre --out pets --name "フランドール" \
     --poses idle,reading,typing,tugging,happy,sick,sleeping,thinking \
-    --also scripts/pets/sheets/flandre-extra.jpg 4x2 _,hammering,peeking,_,sulking,_,levelup \n    --also scripts/pets/sheets/flandre-extra2.jpg 4x2 ref,bored,working,_,ref
+    --also scripts/pets/sheets/flandre-extra.jpg 4x2 _,hammering,peeking,_,sulking,_,levelup \
+    --also scripts/pets/sheets/flandre-extra2.jpg 4x2 ref,bored,working,_,ref
 ```
 
 `--also` adds a second grid to the same skin and scales it to match the first; `_` skips a cell, and `ref` marks a plain standing pose used only to match the size. They are fan art for non-commercial use, see [ASSETS-LICENSE.md](ASSETS-LICENSE.md).
@@ -102,11 +103,18 @@ The 新增一隻寵物 menu item adds another pet to the desktop. Each pet has i
 Like the classic [Shimeji](https://kilkakon.com/shimeji/), the pets move around while you work on something else:
 
 - They stroll back and forth along the bottom of the screen, at the height where you left them.
-- Two idle pets walk to each other and chat. Hikari and Nozomi have their own twin banter.
+- Two idle pets walk to each other and chat. Hikari and Nozomi have their own twin banter, and so do Flandre and Remilia.
 - When your mouse comes close, they sometimes turn and say hi.
-- Now and then they mumble to themselves.
+- Now and then they mumble to themselves. DeepSeek-tan, Flandre and Remilia have their own lines.
+- While you type, they stay where they are and cheer you on once in a while. "Typing" means the system sees keyboard input while the mouse stays still for 3 seconds.
 
 They stay put while working, while holding a permission sign, while being dragged, and for a minute after you drop them. A mouse resting on a pet also keeps it from walking off. The 自由走動・互動 menu item turns all of this off. You can also set `"wander": false` in the config.
+
+### When you play a game
+
+On Windows the pets get out of the way while a full-screen game runs. They shrink to half size, line up in the bottom-right corner, stop walking and talking, and turn off read-aloud. When the game closes they go back to where they were. If a task is running, it keeps going, and a permission sign still shows up (just smaller).
+
+The app asks Windows every 3 seconds whether something full-screen owns the display (the same check Windows uses for its own do-not-disturb). Games in a borderless window don't count as full-screen, so you can also list them by process name in the config, for example `"gameProcesses": ["Genshin.exe"]`. The 玩遊戲時縮到角落 menu item, or `"gameMode": false`, turns this off. Full-screen videos and presentations also count as full-screen.
 
 ## Looks (skins)
 
@@ -143,13 +151,16 @@ On first launch the app writes `~/.acp-pet/config.json`:
   "scale": 1,
   "alwaysOnTop": true,
   "tts": false,
-  "wander": true
+  "wander": true,
+  "gameMode": true,
+  "gameProcesses": []
 }
 ```
 
 - `agent` is any [acpx agent name](https://github.com/openclaw/acpx), such as `codex` or `gemini`. The agent must already be installed and logged in.
 - `workspace` is the folder the agent works in. Use a separate practice folder for each pet.
-- `scale` (0.75, 1, 1.25, 1.5 or 2), `alwaysOnTop`, `tts` (read the speech bubbles aloud) and `wander` can also be changed from the menu.
+- `scale` (0.75, 1, 1.25, 1.5 or 2), `alwaysOnTop`, `tts` (read the speech bubbles aloud), `wander` and `gameMode` can also be changed from the menu.
+- `gameProcesses` lists extra games to watch for, by process name (`Genshin.exe` or `genshin`). The list is read when the app starts.
 - An old v0.1 config (`{ "agent", "workspace" }`) is converted automatically.
 
 ## Safety
@@ -180,8 +191,9 @@ acpx runtime ─ AcpRuntimeEvent ─▶ AcpEventNormalizer ─ PetEvent ─▶ P
 | `src/core/ambient.ts` | Decides who strolls, chats or says hi next |
 | `src/core/skins.ts` | Loads skins: recolors, picture folders, Codex pet packs (v1 and v2) |
 | `src/core/look.ts` | v2 look-around: mouse angle to one of 16 frames |
+| `src/core/game.ts` | Rules for "is a game running" and "is the user typing" |
 | `src/core/fake-source.ts` | Scripted turns for `/demo` and `/fail` |
-| `src/main/` | Electron side: one transparent click-through window per pet, tray, menus, settings |
+| `src/main/` | Electron side: one transparent click-through window per pet, tray, menus, settings, and the game and typing watcher (`game-watch.ts`) |
 | `src/renderer/` | Pixel sprite drawn in code, skin rendering, speech bubble, permission sign, read-aloud |
 | `pets/` | Bundled pets: Hikari and Nozomi (illustrated and pixel), DeepSeek-tan, Flandre and Remilia (pictures) |
 | `scripts/pets/` | Python scripts that draw the twins' sprite sheets and cut pose grids into picture skins |

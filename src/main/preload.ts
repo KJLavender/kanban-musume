@@ -22,7 +22,8 @@ const api = {
   onShowDiary: (cb: (d: DiaryEntry[]) => void) => on("pet:show-diary", cb),
   prompt: (text: string, mode: InputMode = "feed") => ipcRenderer.send("pet:prompt", text, mode),
   answer: (id: string, decision: PermissionDecision) => ipcRenderer.send("pet:answer", id, decision),
-  interact: (action: "pet" | "sleep" | "wake") => ipcRenderer.send("pet:interact", action),
+  interact: (action: "pet" | "sleep" | "wake", zone?: "head" | "cheek" | "body") =>
+    ipcRenderer.send("pet:interact", action, zone),
   setClickThrough: (on: boolean) => ipcRenderer.send("pet:click-through", on),
   dragStart: () => ipcRenderer.send("pet:drag-start"),
   dragMove: () => ipcRenderer.send("pet:drag-move"),

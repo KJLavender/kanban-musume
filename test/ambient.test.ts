@@ -97,7 +97,35 @@ describe("planAmbient", () => {
   });
 });
 
+describe("planAmbient while the user types", () => {
+  it("never walks off; only an occasional quiet cheer", () => {
+    for (let i = 0; i < 200; i++) {
+      const act = planAmbient([pet({ x: 100 }), pet({ name: "ノゾミ", x: 1400, cursorNear: true })], Math.random, { userTyping: true });
+      expect(act === null || act.kind === "mumble").toBe(true);
+    }
+    expect(planAmbient([pet()], seq(0.1, 0), { userTyping: true })).toMatchObject({ kind: "mumble" });
+    expect(planAmbient([pet()], seq(0.9), { userTyping: true })).toBeNull();
+  });
+});
+
 describe("chatLines", () => {
+  it("the Scarlet sisters talk to each other, whoever starts", () => {
+    const [a, b] = chatLines({ name: "レミリア", skin: "remilia" }, { name: "フランドール", skin: "flandre" }, () => 0);
+    expect(a).toContain("芙蘭");
+    expect(b).toBeTruthy();
+    const [c] = chatLines({ name: "妹妹", skin: "flandre" }, { name: "姊", skin: "remilia" }, () => 0);
+    expect(c).toContain("姊姊");
+  });
+
+  it("character pets mumble their own lines", () => {
+    const lines = new Set<string>();
+    for (let i = 0; i < 300; i++) {
+      const act = planAmbient([pet({ name: "DeepSeek娘", skin: "deepseek" })], Math.random);
+      if (act?.kind === "mumble") lines.add(act.line);
+    }
+    expect([...lines].some((l) => l.includes("鯨魚") || l.includes("深度思考"))).toBe(true);
+  });
+
   it("the Tachibana twins get their own banter", () => {
     const [a, b] = chatLines("ヒカリ", "ノゾミ", () => 0);
     expect(a).toContain("ノゾミ");

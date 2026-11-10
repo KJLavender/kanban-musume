@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runRace } from "../core/race.js";
 import { startAmbient } from "./ambient-driver.js";
+import { startGameWatch, type GameWatch } from "./game-watch.js";
 import { listSkins } from "../core/skins.js";
 import {
   loadConfig,
@@ -33,6 +34,16 @@ export let config: PetConfig;
 export const pets: PetWindow[] = [];
 let tray: Tray | null = null;
 let racing = false;
+let watch: GameWatch | null = null;
+
+/** Game mode on/off for every pet, if the user hasn't switched the feature off. */
+function applyGameMode() {
+  const on = config.gameMode && Boolean(watch?.gaming);
+  for (const p of pets) {
+    if (on) p.enterGameMode(config);
+    else p.exitGameMode(config);
+  }
+}
 
 const petFor = (e: IpcMainEvent) => pets.find((p) => !p.win.isDestroyed() && p.win.webContents === e.sender);
 
@@ -55,6 +66,7 @@ export async function addPet(): Promise<PetWindow> {
   await saveConfig(config);
   const pet = await spawnPet(config.pets.length - 1);
   pets.forEach((p) => p.sendSettings(config));
+  applyGameMode();
   return pet;
 }
 
@@ -67,9 +79,10 @@ async function removePet(pet: PetWindow) {
   pets.forEach((p) => p.sendSettings(config));
 }
 
-export async function updateSettings(patch: Partial<Pick<PetConfig, "scale" | "alwaysOnTop" | "tts" | "wander">>) {
+export async function updateSettings(patch: Partial<Pick<PetConfig, "scale" | "alwaysOnTop" | "tts" | "wander" | "gameMode">>) {
   Object.assign(config, patch);
   for (const p of pets) p.applySettings(config);
+  applyGameMode();
   await saveConfig(config);
 }
 
@@ -155,6 +168,13 @@ function appMenu(): MenuItemConstructorOptions[] {
         if (!i.checked) pets.forEach((p) => p.stopWalking());
       },
     },
+    {
+      label: process.platform === "win32" ? "玩遊戲時縮到角落" : "玩遊戲時縮到角落(只支援 Windows)",
+      type: "checkbox",
+      checked: config.gameMode,
+      enabled: process.platform === "win32",
+      click: (i) => void updateSettings({ gameMode: i.checked }),
+    },
     { label: "打開設定資料夾…", click: () => void shell.openPath(dirname(skinsDir())) },
     { type: "separator" },
     { label: "離開", click: () => app.quit() },
@@ -194,8 +214,9 @@ function wireIpc() {
   ipcMain.on("pet:answer", (e, id: string, decision: string) =>
     petFor(e)?.controller.answer(String(id), decision === "allow" ? "allow" : "reject"),
   );
-  ipcMain.on("pet:interact", (e, action: string) => {
-    if (action === "pet" || action === "sleep" || action === "wake") petFor(e)?.controller.interact(action);
+  ipcMain.on("pet:interact", (e, action: string, zone: unknown) => {
+    const where = zone === "head" || zone === "cheek" || zone === "body" ? zone : undefined;
+    if (action === "pet" || action === "sleep" || action === "wake") petFor(e)?.controller.interact(action, where);
   });
   ipcMain.on("pet:click-through", (e, on: boolean) => petFor(e)?.win.setIgnoreMouseEvents(Boolean(on), { forward: true }));
   ipcMain.on("pet:drag-start", (e) => petFor(e)?.dragStart());
@@ -222,7 +243,17 @@ async function boot() {
   setInterval(() => pets.forEach((p) => p.controller.tick()), 250);
   setInterval(() => pets.forEach((p) => void p.persist()), 30_000);
   // Smoke runs drive ambient scenes themselves; random strolls would break their checks.
-  if (!SMOKE) startAmbient(() => pets, () => config.wander, log);
+  if (!SMOKE) {
+    watch = startGameWatch({
+      games: config.gameProcesses,
+      onGaming: (on, why) => {
+        log(`game mode ${on ? "on" : "off"} (${why})`);
+        applyGameMode();
+      },
+      log,
+    });
+    startAmbient(() => pets, () => config.wander, log, () => ({ userTyping: Boolean(watch?.typing) }));
+  }
 
   if (SMOKE) {
     const { runSmoke } = await import("./smoke.js");
@@ -238,6 +269,7 @@ else {
     if (quitting) return;
     quitting = true;
     e.preventDefault();
+    watch?.stop();
     void Promise.allSettled(pets.map((p) => p.dispose())).then(() => app.quit());
   });
   app.on("window-all-closed", () => app.quit());

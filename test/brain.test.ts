@@ -187,6 +187,32 @@ describe("PetBrain", () => {
     expect(b.tick(7000).state).toBe("idle");
   });
 
+  it("where you touch changes what it says; poking the cheek counts for less", () => {
+    const b = fresh({ needs: { mood: 50 } });
+    b.interact("pet", 0, "head");
+    const head = b.tick(0);
+    expect(head).toMatchObject({ state: "happy", needs: { mood: 53 } });
+    expect(head.line).toContain("摸頭");
+    b.interact("pet", 10_000, "cheek");
+    const cheek = b.tick(10_000);
+    expect(cheek.needs.mood).toBeCloseTo(54, 0); // +1, minus a little decay
+    expect(cheek.line).toContain("戳臉");
+  });
+
+  it("gets annoyed when poked five times in a few seconds", () => {
+    const b = fresh({ needs: { mood: 50 } });
+    for (let t = 0; t < 4; t++) b.interact("pet", t * 500, "cheek");
+    expect(b.tick(1500).state).toBe("happy");
+    b.interact("pet", 2000, "cheek");
+    const s = b.tick(2000);
+    expect(s.state).toBe("sulking");
+    expect(s.line).toBe("再戳我要生氣了!");
+    // slow, spaced-out pats never add up to annoyance
+    const c = fresh();
+    for (let t = 0; t < 8; t++) c.interact("pet", t * 5000, "head");
+    expect(c.tick(35_000).state).toBe("happy");
+  });
+
   it("won't nap or celebrate a pat while a turn is running", () => {
     const b = fresh();
     b.handle({ type: "turn_start", prompt: "hi" }, 0);

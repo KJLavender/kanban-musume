@@ -309,6 +309,17 @@ function updateClickThrough(force?: boolean, x?: number, y?: number) {
 }
 
 let press: { x: number; y: number; dragging: boolean } | null = null;
+
+/** Which part of the pet a click hit: top of the drawing is the head, then the face, then the body. */
+function touchZone(x: number, y: number): "head" | "cheek" | "body" {
+  const el = skin.type === "images" ? petImg : canvas;
+  const r = el.getBoundingClientRect();
+  const fy = (y - r.top) / Math.max(1, r.height);
+  const fx = Math.abs((x - r.left) / Math.max(1, r.width) - 0.5);
+  if (fy < 0.24) return "head";
+  if (fy < 0.42 && fx < 0.3) return "cheek";
+  return "body";
+}
 let clickTimer: ReturnType<typeof setTimeout> | undefined;
 
 window.addEventListener("mousemove", (e) => {
@@ -334,6 +345,7 @@ art.addEventListener("mousedown", (e) => {
 window.addEventListener("mouseup", () => {
   if (!press) return;
   const wasDrag = press.dragging;
+  const at = press;
   press = null;
   if (wasDrag) {
     api.dragEnd();
@@ -347,7 +359,8 @@ window.addEventListener("mouseup", () => {
   } else {
     clickTimer = setTimeout(() => {
       clickTimer = undefined;
-      api.interact(snap?.state === "sleeping" ? "wake" : "pet");
+      if (snap?.state === "sleeping") api.interact("wake");
+      else api.interact("pet", touchZone(at.x, at.y));
     }, 250);
   }
 });

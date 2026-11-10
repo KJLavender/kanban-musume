@@ -51,7 +51,7 @@ npm start         # 正式使用
 
 操作方式:
 
-- 單擊寵物摸摸牠,雙擊開啟任務框,拖曳可以移動位置。
+- 單擊寵物摸摸牠。點的位置不同,反應也不同:摸頭會開心,戳臉頰會嘟嘴,幾秒內連點五下會生氣。雙擊開啟任務框,拖曳可以移動位置。
 - 在寵物上按右鍵,或點托盤圖示,開啟選單。
 
 任務框可以輸入:
@@ -88,7 +88,8 @@ npm start         # 正式使用
 ```bash
 python scripts/pets/import_sheet.py scripts/pets/sheets/flandre-main.jpg flandre --out pets --name "フランドール" \
     --poses idle,reading,typing,tugging,happy,sick,sleeping,thinking \
-    --also scripts/pets/sheets/flandre-extra.jpg 4x2 _,hammering,peeking,_,sulking,_,levelup \n    --also scripts/pets/sheets/flandre-extra2.jpg 4x2 ref,bored,working,_,ref
+    --also scripts/pets/sheets/flandre-extra.jpg 4x2 _,hammering,peeking,_,sulking,_,levelup \
+    --also scripts/pets/sheets/flandre-extra2.jpg 4x2 ref,bored,working,_,ref
 ```
 
 `--also` 會把第二張格子圖加進同一個外表,並把角色縮放成跟第一張一樣大;`_` 代表跳過那一格,`ref` 代表這格只拿來對齊大小、不輸出。這些是同人二創,僅限非商業使用,詳見 [ASSETS-LICENSE.md](ASSETS-LICENSE.md)。
@@ -102,11 +103,18 @@ python scripts/pets/import_sheet.py scripts/pets/sheets/flandre-main.jpg flandre
 像經典的 [Shimeji](https://kilkakon.com/shimeji/) 一樣,你忙別的事時,寵物也會自己動:
 
 - 牠們會沿著螢幕底部來回散步,高度維持在你放下的位置。
-- 兩隻閒著的寵物會走到彼此身邊聊天。ヒカリ和ノゾミ有專屬的雙胞胎對話。
+- 兩隻閒著的寵物會走到彼此身邊聊天。ヒカリ和ノゾミ有專屬的雙胞胎對話,芙蘭朵露和蕾米莉亞也有姊妹對話。
 - 滑鼠靠近時,牠們有時會轉過來打招呼。
-- 偶爾會自言自語。
+- 偶爾會自言自語。DeepSeek娘、芙蘭朵露、蕾米莉亞有各自的台詞。
+- 你在打字時,牠們會待在原地,偶爾幫你加油。「打字」的判斷方式是:系統偵測到鍵盤輸入,而且滑鼠連續 3 秒沒動。
 
 工作中、舉著權限牌時、被拖曳時,以及被你放下後的一分鐘內,牠們會待在原地。滑鼠停在寵物上也會讓牠不走開。選單的「自由走動・互動」可以把這些全部關掉,也可以在設定檔寫 `"wander": false`。
+
+### 玩遊戲的時候
+
+在 Windows 上,全螢幕遊戲開著時寵物會自動讓開:縮成一半大小、排在螢幕右下角、不走動也不說話,唸台詞也會暫停。遊戲關掉後就回到原本的位置。如果有任務在跑,任務會繼續,權限牌也照樣會出現(只是比較小)。
+
+程式每 3 秒問一次 Windows 現在是不是有全螢幕的東西佔住畫面(Windows 自己的勿擾功能也是用這個判斷)。無邊框視窗模式的遊戲不算全螢幕,可以在設定檔用執行檔名稱列出來,例如 `"gameProcesses": ["Genshin.exe"]`。選單的「玩遊戲時縮到角落」或設定檔的 `"gameMode": false` 可以關掉這個功能。全螢幕看影片、簡報也會被當成全螢幕。
 
 ## 外表(skin)
 
@@ -143,13 +151,16 @@ python scripts/pets/import_sheet.py scripts/pets/sheets/flandre-main.jpg flandre
   "scale": 1,
   "alwaysOnTop": true,
   "tts": false,
-  "wander": true
+  "wander": true,
+  "gameMode": true,
+  "gameProcesses": []
 }
 ```
 
 - `agent` 可以是任何 [acpx 的 agent 名稱](https://github.com/openclaw/acpx),例如 `codex` 或 `gemini`。該 agent 必須已經安裝並登入。
 - `workspace` 是 agent 工作的資料夾。每隻寵物請各用一個獨立的練習用資料夾。
-- `scale`(0.75、1、1.25、1.5 或 2)、`alwaysOnTop`、`tts`(把對話框的台詞唸出來)和 `wander` 也可以從選單改。
+- `scale`(0.75、1、1.25、1.5 或 2)、`alwaysOnTop`、`tts`(把對話框的台詞唸出來)、`wander` 和 `gameMode` 也可以從選單改。
+- `gameProcesses` 用執行檔名稱(`Genshin.exe` 或 `genshin`)列出要額外偵測的遊戲,程式啟動時讀取。
 - 舊的 v0.1 設定檔(`{ "agent", "workspace" }`)會自動轉換。
 
 ## 安全
@@ -180,8 +191,9 @@ acpx runtime ─ AcpRuntimeEvent ─▶ AcpEventNormalizer ─ PetEvent ─▶ P
 | `src/core/ambient.ts` | 決定下一個要散步、聊天還是打招呼的是誰 |
 | `src/core/skins.ts` | 載入外表:換色、圖片資料夾、Codex 角色包(v1 與 v2) |
 | `src/core/look.ts` | v2 的轉頭看:滑鼠角度對應到 16 格其中之一 |
+| `src/core/game.ts` | 判斷「是不是在玩遊戲」「是不是在打字」的規則 |
 | `src/core/fake-source.ts` | `/demo` 和 `/fail` 用的腳本演出 |
-| `src/main/` | Electron 端:每隻寵物一個透明、可穿透點擊的視窗,還有托盤、選單、設定 |
+| `src/main/` | Electron 端:每隻寵物一個透明、可穿透點擊的視窗,還有托盤、選單、設定,以及偵測遊戲和打字的 `game-watch.ts` |
 | `src/renderer/` | 用程式畫的像素 sprite、外表顯示、對話框、權限牌、唸台詞 |
 | `pets/` | 內附的寵物:ヒカリ和ノゾミ(插畫版與像素版),DeepSeek娘、芙蘭朵露、蕾米莉亞(圖片外表) |
 | `scripts/pets/` | 畫雙胞胎 sprite sheet、把動作格子圖切成圖片外表的 Python 腳本 |
