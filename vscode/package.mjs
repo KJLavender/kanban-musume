@@ -1,4 +1,4 @@
-// Packs vscode/ into acp-pet-vscode-<version>.vsix (run from the repo root:
+// Packs vscode/ into kanban-musume-vscode-<version>.vsix (run from the repo root:
 // npm run vscode:package). acpx is the only runtime dependency; it is
 // installed into vscode/node_modules so the package carries it.
 import { execSync } from "node:child_process";

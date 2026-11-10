@@ -8,7 +8,7 @@ The illustrations and pixel art in `pets/hikari*/`, `pets/nozomi*/` and `docs/pe
 - The fan-art sprites may be used, shared and modified for **non-commercial** purposes, with credit to this repository. Don't sell them or use them in commercial products.
 - If a rights holder asks for removal, the assets will be taken down.
 
-`pets/deepseek/`, `pets/flandre/`, `pets/remilia/`, `scripts/pets/sheets/` and `docs/guests.png` are AI-generated fan art. DeepSeek-tan is a fan mascot of DeepSeek's model; DeepSeek is a trademark of its owner. Flandre Scarlet and Remilia Scarlet are from *Touhou Project*, whose characters belong to ZUN (Team Shanghai Alice). The same rules apply: non-commercial use only, credit this repository, and anything a rights holder asks to remove will be removed.
+`pets/deepseek/`, `pets/flandre/`, `pets/remilia/`, `pets/hikari-art/`, `pets/nozomi-art/` (including each `background.png`), `scripts/pets/sheets/` (including `backgrounds/`), `docs/guests.png` and `docs/vscode-editor.png` are AI-generated fan art. Hikari and Nozomi belong to Blue Archive (NEXON Games and Yostar). DeepSeek-tan is a fan mascot of DeepSeek's model; DeepSeek is a trademark of its owner. Flandre Scarlet and Remilia Scarlet are from *Touhou Project*, whose characters belong to ZUN (Team Shanghai Alice). The same rules apply: non-commercial use only, credit this repository, and anything a rights holder asks to remove will be removed.
 
 ---
 
@@ -18,4 +18,4 @@ The illustrations and pixel art in `pets/hikari*/`, `pets/nozomi*/` and `docs/pe
 - 這些同人 sprite 可以在**非商業**用途下使用、分享、修改,請註明出處為本 repo。不要拿去販售或用在商業產品。
 - 如果權利人要求移除,會立刻下架。
 
-`pets/deepseek/`、`pets/flandre/`、`pets/remilia/`、`scripts/pets/sheets/` 和 `docs/guests.png` 是用 AI 產生的同人圖。DeepSeek娘是 DeepSeek 模型的同人看板娘,DeepSeek 是其所有者的商標。芙蘭朵露·斯卡雷特與蕾米莉亞·斯卡雷特出自《東方 Project》,角色權利屬於 ZUN(上海アリス幻樂団)。規則同上:僅限非商業使用、請註明出處為本 repo,權利人要求移除就會下架。
+`pets/deepseek/`、`pets/flandre/`、`pets/remilia/`、`pets/hikari-art/`、`pets/nozomi-art/`(包含各自的 `background.png`)、`scripts/pets/sheets/`(包含 `backgrounds/`)、`docs/guests.png` 和 `docs/vscode-editor.png` 是用 AI 產生的同人圖。ヒカリ和ノゾミ出自《蔚藍檔案》(NEXON Games 與 Yostar)。DeepSeek娘是 DeepSeek 模型的同人看板娘,DeepSeek 是其所有者的商標。芙蘭朵露·斯卡雷特與蕾米莉亞·斯卡雷特出自《東方 Project》,角色權利屬於 ZUN(上海アリス幻樂団)。規則同上:僅限非商業使用、請註明出處為本 repo,權利人要求移除就會下架。

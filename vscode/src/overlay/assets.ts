@@ -36,7 +36,7 @@ export type BuildOptions = {
   ids: string[];
   /** Searched in order for <id>/ folders with pictures (bundled pets, then ~/.acp-pet/skins). */
   skinDirs: string[];
-  /** Holds <id>.png/.webp/.jpg backgrounds (~/.acp-pet/backgrounds). */
+  /** Holds <id>.png/.webp/.jpg backgrounds (~/.acp-pet/backgrounds); falls back to background.* in the skin folder. */
   backgroundDir: string;
   rotateMinutes: number;
   backgroundOpacity: number;
@@ -85,9 +85,15 @@ export async function buildOverlay(out: string, opts: BuildOptions): Promise<Ove
       frames[pose] = `${id}/${file}`;
     }
     let background: string | null = null;
-    // Cut-outs (PNG/WebP with transparency) first; see scripts/pets/cut_background.py.
-    for (const ext of [".png", ".webp", ".jpg", ".jpeg"]) {
-      const src = join(opts.backgroundDir, `${id}${ext}`);
+    // Your own picture in ~/.acp-pet/backgrounds wins over the one shipped in the
+    // skin folder. Cut-outs (PNG/WebP with transparency) first; see scripts/pets/cut_background.py.
+    const exts = [".png", ".webp", ".jpg", ".jpeg"];
+    const candidates = [
+      ...exts.map((ext) => join(opts.backgroundDir, `${id}${ext}`)),
+      ...exts.map((ext) => join(found.dir, `background${ext}`)),
+    ];
+    for (const src of candidates) {
+      const ext = extname(src);
       if (existsSync(src)) {
         await copyFile(src, join(target, `background${ext}`));
         background = `${id}/background${ext}`;

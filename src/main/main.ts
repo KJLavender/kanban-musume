@@ -236,7 +236,7 @@ async function boot() {
 
   if (!SMOKE) {
     tray = new Tray(trayIcon());
-    tray.setToolTip("ACP Pet");
+    tray.setToolTip("Kanban Musume");
     tray.on("click", async () => tray?.popUpContextMenu(await trayMenu()));
   }
 

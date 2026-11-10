@@ -1,8 +1,27 @@
-# acp-pet:會演出 coding agent 在做什麼的桌面寵物
+# Kanban Musume 看板娘:寫程式時陪著你的動漫角色
 
 [English](README.md) | **繁體中文**
 
-acp-pet 是一隻住在桌面上的小寵物,會即時演出 coding agent 正在做的事。agent 在讀檔案,寵物就翻書;agent 在改程式,寵物就打字;agent 要做有風險的事、需要你同意時,寵物會舉一塊寫著「准」和「不准」的牌子跑過來問你。
+Kanban Musume(看板娘)把動漫角色放到你的程式碼旁邊。在 VS Code 裡,角色會站在編輯器角落,後面是她自己的淡化插畫;她會沿著視窗邊緣走來走去、跟著你打字、被點到會有反應,每隔幾分鐘換下一個角色上場。另外還有一個桌面寵物,會演出 coding agent 正在做的事。
+
+<p align="center"><img src="docs/vscode-editor.png" width="100%" alt="ヒカリ站在 VS Code 編輯器角落,後面是淡化的插畫"></p>
+
+## 快速開始(VS Code)
+
+1. 到[最新版本](https://github.com/KJLavender/kanban-musume/releases/latest)下載 `kanban-musume-vscode-0.2.0.vsix`。這是 Windows 版。
+2. 安裝。在 VS Code 打開「擴充功能」,點右上角的 `...`,選「從 VSIX 安裝...」,選這個檔案。或是在終端機執行:
+
+   ```bash
+   code --install-extension kanban-musume-vscode-0.2.0.vsix
+   ```
+
+3. 按 `Ctrl+Shift+P`,執行「Kanban Musume: 把角色放進編輯器」,按「繼續」,再按「重新載入視窗」。
+
+角色會出現在右下角。在她身上按右鍵換下一個角色,可以把她拖到任何地方,點她的頭或臉頰會有反應。角色有 DeepSeek娘、芙蘭朵露和蕾米莉亞(東方 Project),以及ヒカリ和ノゾミ(蔚藍檔案),每個都有自己的背景插畫。想移除的話,在解除安裝前先執行「Kanban Musume: 把角色從編輯器移除」。詳細說明在[在 VS Code 裡](#在-vs-code-裡)。
+
+## 桌面寵物
+
+桌面寵物會即時演出 coding agent 正在做的事。agent 在讀檔案,寵物就翻書;agent 在改程式,寵物就打字;agent 要做有風險的事、需要你同意時,寵物會舉一塊寫著「准」和「不准」的牌子跑過來問你。
 
 它支援講 [ACP](https://agentclientprotocol.com)(Agent Client Protocol,程式與 coding agent 溝通的標準協定)的 agent,例如 Claude Code（預設）、Codex 或 Gemini CLI。寵物不聊天,也不靠讀 log 猜。它直接讀 agent 真實的 `session/update` 事件,事件一來就演出來。
 
@@ -140,15 +159,15 @@ python scripts/pets/import_sheet.py scripts/pets/sheets/flandre-main.jpg flandre
 
 ## 在 VS Code 裡
 
-`vscode/` 裡還有一個 VS Code 版。寵物住在檔案總管側邊欄最下面的「ACP Pet」面板,而且角色會輪流上場:每 5 分鐘換下一個,上場時會打招呼。任務做到一半或舉著權限牌時不會換。
+`vscode/` 裡還有一個 VS Code 版。寵物住在檔案總管側邊欄最下面的「Kanban Musume」面板,而且角色會輪流上場:每 5 分鐘換下一個,上場時會打招呼。任務做到一半或舉著權限牌時不會換。
 
 牠會對這些事情有反應:
 
 - 你自己的編輯:你打字牠跟著打字,出現新的錯誤會生病、錯誤全部清掉會開心,跑 task 時敲榔頭,偵錯時拿望遠鏡。
-- 給 agent 的任務:在指令面板執行「ACP Pet: 餵任務給寵物」,或在寵物上雙擊。agent 會在你開的第一個資料夾裡工作。跟桌面版不同,這是你真正的專案,所以權限牌很重要:修改檔案和執行指令一樣要你在面板裡按「准」。
+- 給 agent 的任務:在指令面板執行「Kanban Musume: 餵任務給寵物」,或在寵物上雙擊。agent 會在你開的第一個資料夾裡工作。跟桌面版不同,這是你真正的專案,所以權限牌很重要:修改檔案和執行指令一樣要你在面板裡按「准」。
 - 點擊:跟桌面版一樣(摸頭、戳臉頰)。按右鍵會開一個小選單。
 
-目前還沒上架 Marketplace。從這個 repo 試用:
+沒有上架 Marketplace。請從 Releases 下載 `.vsix` 安裝(見[快速開始](#快速開始vs-code)),或從這個 repo 直接執行:
 
 ```bash
 npm install
@@ -156,7 +175,7 @@ npm run vscode:build
 code --extensionDevelopmentPath="$PWD/vscode"
 ```
 
-這會另外開一個載入了擴充套件的 VS Code 視窗。設定(搜尋 `acpPet`):
+這會另外開一個載入了擴充套件的 VS Code 視窗。`npm run vscode:package` 會打包出 `.vsix`(Windows PowerShell 如果因為「已停用指令碼執行」擋掉 `npm`,改打 `npm.cmd`)。設定(搜尋 `acpPet`):
 
 - `acpPet.characters`:輪流上場的角色,照順序。預設是 `deepseek`、`flandre`、`remilia`、`hikari-art`、`nozomi-art`。沒安裝的會自動跳過。
 - `acpPet.rotateMinutes`:幾分鐘換一次。`0` 代表不換。
@@ -166,7 +185,7 @@ code --extensionDevelopmentPath="$PWD/vscode"
 
 ### 編輯器裡的角色
 
-跟 [doki-theme](https://github.com/doki-theme/doki-theme-vscode) 一樣,擴充套件也可以把角色直接放進編輯器:她站在右下角,後面是淡淡的背景插畫。在指令面板執行「ACP Pet: 把角色放進編輯器」,再重新載入視窗。
+跟 [doki-theme](https://github.com/doki-theme/doki-theme-vscode) 一樣,擴充套件也可以把角色直接放進編輯器:她站在右下角,後面是淡淡的背景插畫。在指令面板執行「Kanban Musume: 把角色放進編輯器」,再重新載入視窗。
 
 - 她會呼吸晃動,你打字時跟著打字,點她會有反應(摸頭、戳臉頰;幾秒內連點五下會生氣)。
 - 她會沿著視窗底部走來走去。可以把她拖到任何地方,她會記住位置(拖離底部的話她就待在原地)。在她身上按右鍵換下一個角色。
@@ -174,9 +193,9 @@ code --extensionDevelopmentPath="$PWD/vscode"
 - 10 分鐘沒碰鍵盤滑鼠她會睡著,你回來就會醒。偶爾會自言自語。
 - 每隔幾分鐘(`acpPet.rotateMinutes`)換下一個角色,背景也跟著換。
 
-只會用圖片角色(內附的 DeepSeek娘、芙蘭朵露、蕾米莉亞,以及 `~/.acp-pet/skins` 裡的資料夾,例如你自己的 `hikari-art`)。背景圖從 `~/.acp-pet/backgrounds/<id>.png`(或 `.webp`、`.jpg`)讀取,不會被放進這個 repo。請用去背、背景透明的圖,跟 doki-theme 一樣;`python scripts/pets/cut_background.py art.jpg deepseek` 可以把純白的底去掉(黑底加 `--backdrop black`,兩種都有用 `both`)。沒有純色底的完整場景圖,用 `--backdrop none --feather 0.15` 讓四邊淡出,不會變成一個方框;人物被圖片下緣切到的話加 `--no-bottom`,避免下緣淺色的皮膚被當成背景去掉。`acpPet.editor.backgroundOpacity` 調背景的明顯程度(預設 0.12,0 就是不顯示),`acpPet.editor.height` 調角色大小。
+只會用圖片角色:內附的 DeepSeek娘、芙蘭朵露、蕾米莉亞、ヒカリ、ノゾミ(`hikari-art`、`nozomi-art`),以及你放進 `~/.acp-pet/skins` 的圖片資料夾。內附的角色都附有背景圖,放在 `pets/<id>/background.png`。想換成自己的,放一張 `~/.acp-pet/backgrounds/<id>.png`(或 `.webp`、`.jpg`),會優先使用。請用去背、背景透明的圖,跟 doki-theme 一樣;`python scripts/pets/cut_background.py art.jpg deepseek` 可以把純白的底去掉(黑底加 `--backdrop black`,兩種都有用 `both`)。沒有純色底的完整場景圖,用 `--backdrop none --feather 0.15` 讓四邊淡出,不會變成一個方框;人物被圖片下緣切到的話加 `--no-bottom`,避免下緣淺色的皮膚被當成背景去掉。`acpPet.editor.backgroundOpacity` 調背景的明顯程度(預設 0.12,0 就是不顯示),`acpPet.editor.height` 調角色大小。
 
-做法是改 VS Code 自己的一個檔案(`workbench.html`):加一行 script 和旁邊一個放圖片的資料夾,並更新 `product.json` 裡這個檔案的檢查碼,這樣 VS Code 就不會說安裝已損毀。VS Code 更新後這個修改會消失,擴充套件會發現並問你要不要放回去。想還原,請在解除安裝擴充套件之前執行「ACP Pet: 把角色從編輯器移除」。
+做法是改 VS Code 自己的一個檔案(`workbench.html`):加一行 script 和旁邊一個放圖片的資料夾,並更新 `product.json` 裡這個檔案的檢查碼,這樣 VS Code 就不會說安裝已損毀。VS Code 更新後這個修改會消失,擴充套件會發現並問你要不要放回去。想還原,請在解除安裝擴充套件之前執行「Kanban Musume: 把角色從編輯器移除」。
 
 VS Code 版的寵物有自己的存檔 `~/.acp-pet/vscode-save.json`,等級跟桌面版的寵物分開算。
 

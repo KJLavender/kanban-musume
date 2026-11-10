@@ -17,7 +17,7 @@ async function check(name, fn) {
 }
 
 exports.run = async () => {
-  const ext = vscode.extensions.getExtension("KJLavender.acp-pet-vscode");
+  const ext = vscode.extensions.getExtension("KJLavender.kanban-musume-vscode");
   const api = await ext.activate();
 
   await check("a character is showing on start", () => assert.ok(api.current()));

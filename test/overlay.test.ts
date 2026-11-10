@@ -61,6 +61,21 @@ describe("patching VS Code", () => {
 });
 
 describe("building the overlay folder", () => {
+  it("uses the background shipped in the skin folder when you haven't set your own", async () => {
+    const out = await mkdtemp(join(tmpdir(), "acp-pet-overlay-"));
+    const cfg = await buildOverlay(out, {
+      ids: ["remilia"],
+      skinDirs: [join(__dirname, "..", "pets")],
+      backgroundDir: join(out, "no-such-dir"),
+      rotateMinutes: 5,
+      backgroundOpacity: 0.1,
+      height: 200,
+      script: "",
+    });
+    expect(cfg.characters[0]!.background).toBe("remilia/background.png");
+    expect(existsSync(join(out, "remilia", "background.png"))).toBe(true);
+  });
+
   it("collects picture skins with fallbacks, skips sprite-sheet packs and missing ones", async () => {
     const out = await mkdtemp(join(tmpdir(), "acp-pet-overlay-"));
     const bgs = await mkdtemp(join(tmpdir(), "acp-pet-bg-"));

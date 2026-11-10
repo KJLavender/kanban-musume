@@ -1,13 +1,13 @@
 {
-  "name": "acp-pet-vscode",
-  "displayName": "ACP Pet",
-  "description": "A pet in your sidebar that acts out your editing and your coding agent's work, and takes turns between characters.",
-  "version": "0.1.0",
+  "name": "kanban-musume-vscode",
+  "displayName": "Kanban Musume",
+  "description": "Anime characters living in your editor: a mascot that walks along VS Code's edge over a faded illustration, reacts to your typing and clicks, takes turns with the others, and acts out your coding agent's work.",
+  "version": "0.2.0",
   "publisher": "KJLavender",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KJLavender/acp-pet.git",
+    "url": "https://github.com/KJLavender/kanban-musume.git",
     "directory": "vscode"
   },
   "private": true,
@@ -28,7 +28,7 @@
         {
           "type": "webview",
           "id": "acpPet.view",
-          "name": "ACP Pet",
+          "name": "Kanban Musume",
           "when": "!acpPet.overlayOn"
         }
       ]
@@ -37,36 +37,36 @@
       {
         "command": "acpPet.feed",
         "title": "餵任務給寵物 (Give the pet a task)",
-        "category": "ACP Pet"
+        "category": "Kanban Musume"
       },
       {
         "command": "acpPet.cancel",
         "title": "取消目前任務 (Cancel the task)",
-        "category": "ACP Pet"
+        "category": "Kanban Musume"
       },
       {
         "command": "acpPet.next",
         "title": "換下一個角色 (Next character)",
-        "category": "ACP Pet"
+        "category": "Kanban Musume"
       },
       {
         "command": "acpPet.pick",
         "title": "選擇角色… (Pick a character)",
-        "category": "ACP Pet"
+        "category": "Kanban Musume"
       },
       {
         "command": "acpPet.overlay.install",
         "title": "把角色放進編輯器 (Put the character in the editor)",
-        "category": "ACP Pet"
+        "category": "Kanban Musume"
       },
       {
         "command": "acpPet.overlay.remove",
         "title": "把角色從編輯器移除 (Remove the character from the editor)",
-        "category": "ACP Pet"
+        "category": "Kanban Musume"
       }
     ],
     "configuration": {
-      "title": "ACP Pet",
+      "title": "Kanban Musume",
       "properties": {
         "acpPet.characters": {
           "type": "array",

@@ -1,8 +1,27 @@
-# acp-pet: a desktop pet that acts out what your coding agent is doing
+# Kanban Musume: anime mascots that keep you company while you code
 
 **English** | [繁體中文](README.zh-TW.md)
 
-acp-pet is a small pet that lives on your desktop and shows what a coding agent is doing right now. When the agent reads a file, the pet reads a book. When it edits code, the pet types. When it needs your approval for something risky, the pet holds up a sign with Allow and Deny buttons.
+Kanban Musume (看板娘, "the shop's mascot girl") puts anime characters next to your code. In VS Code, a character stands in the corner of the editor over a faded illustration of herself, walks along the edge of the window, types along with you, reacts when you click her, and every few minutes hands over to the next character. There is also a desktop pet that acts out what your coding agent is doing.
+
+<p align="center"><img src="docs/vscode-editor.png" width="100%" alt="Hikari standing in the corner of the VS Code editor over a faded illustration"></p>
+
+## Quick start (VS Code)
+
+1. Download `kanban-musume-vscode-0.2.0.vsix` from the [latest release](https://github.com/KJLavender/kanban-musume/releases/latest). It is built for Windows.
+2. Install it. In VS Code: Extensions view, the `...` menu, "Install from VSIX...", and pick the file. Or in a terminal:
+
+   ```bash
+   code --install-extension kanban-musume-vscode-0.2.0.vsix
+   ```
+
+3. Press `Ctrl+Shift+P`, run "Kanban Musume: 把角色放進編輯器" (put the character in the editor), click 繼續 (continue), then click 重新載入視窗 (reload window).
+
+She appears in the bottom-right corner. Right-click her for the next character, drag her anywhere, click her head or cheek. Characters: DeepSeek-tan, Flandre and Remilia (Touhou Project), and Hikari and Nozomi (Blue Archive), each with her own background illustration. To take her out again, run "Kanban Musume: 把角色從編輯器移除" before uninstalling. More in [In VS Code](#in-vs-code).
+
+## The desktop pet
+
+The desktop pet shows what a coding agent is doing right now. When the agent reads a file, the pet reads a book. When it edits code, the pet types. When it needs your approval for something risky, the pet holds up a sign with Allow and Deny buttons.
 
 It works with agents that speak [ACP](https://agentclientprotocol.com) (the Agent Client Protocol, a standard way for programs to talk to coding agents), such as Claude Code (the default), Codex or Gemini CLI. The pet doesn't chat and doesn't guess from logs. It reads the agent's real `session/update` events and acts each one out as it arrives.
 
@@ -140,15 +159,15 @@ The menu re-reads the folder each time it opens, so new skins show up without a 
 
 ## In VS Code
 
-There is also a VS Code version in `vscode/`. The pet lives in a panel called ACP Pet at the bottom of the Explorer sidebar, and the characters take turns: every 5 minutes the next one comes on and says hello. It never switches in the middle of a task or while a permission sign is up.
+There is also a VS Code version in `vscode/`. The pet lives in a panel called Kanban Musume at the bottom of the Explorer sidebar, and the characters take turns: every 5 minutes the next one comes on and says hello. It never switches in the middle of a task or while a permission sign is up.
 
 What it reacts to:
 
 - Your own editing: it types along while you type, gets sick when new errors show up and cheers when they are all fixed, hammers while a task runs, and looks through its telescope while you debug.
-- Tasks for the agent: run "ACP Pet: 餵任務給寵物" from the Command Palette, or double-click the pet. The agent works in the first folder you have open. Unlike the desktop app, this is your real project, so the permission sign matters: edits and commands still need your Allow in the panel.
+- Tasks for the agent: run "Kanban Musume: 餵任務給寵物" from the Command Palette, or double-click the pet. The agent works in the first folder you have open. Unlike the desktop app, this is your real project, so the permission sign matters: edits and commands still need your Allow in the panel.
 - Clicks: same as on the desktop (head pat, cheek poke). Right-click opens a small menu.
 
-It is not on the Marketplace yet. To try it from this repo:
+It is not on the Marketplace. Install the `.vsix` from Releases (see [Quick start](#quick-start-vs-code)), or run it from this repo:
 
 ```bash
 npm install
@@ -156,7 +175,7 @@ npm run vscode:build
 code --extensionDevelopmentPath="$PWD/vscode"
 ```
 
-That opens a second VS Code window with the extension loaded. Settings (search for `acpPet`):
+That opens a second VS Code window with the extension loaded. `npm run vscode:package` builds the `.vsix` (in Windows PowerShell, type `npm.cmd` if `npm` is blocked by the script execution policy). Settings (search for `acpPet`):
 
 - `acpPet.characters`: which characters take turns, in order. Default: `deepseek`, `flandre`, `remilia`, `hikari-art`, `nozomi-art`. Ones that aren't installed are skipped.
 - `acpPet.rotateMinutes`: minutes between switches. `0` keeps the current character.
@@ -166,7 +185,7 @@ That opens a second VS Code window with the extension loaded. Settings (search f
 
 ### The character in the editor
 
-Like [doki-theme](https://github.com/doki-theme/doki-theme-vscode), the extension can also put the character right in the editor: she stands in the bottom-right corner over a faded background illustration. Run "ACP Pet: 把角色放進編輯器" from the Command Palette and reload the window.
+Like [doki-theme](https://github.com/doki-theme/doki-theme-vscode), the extension can also put the character right in the editor: she stands in the bottom-right corner over a faded background illustration. Run "Kanban Musume: 把角色放進編輯器" from the Command Palette and reload the window.
 
 - She breathes, types along while you type, and reacts when you click her (pat her head, poke her cheek; five clicks in a few seconds and she sulks).
 - She strolls back and forth along the bottom edge of the window. Drag her anywhere; she remembers the spot (dragged off the bottom edge, she stays put). Right-click her for the next character.
@@ -174,9 +193,9 @@ Like [doki-theme](https://github.com/doki-theme/doki-theme-vscode), the extensio
 - She falls asleep after 10 minutes without keyboard or mouse, and wakes up when you come back. Now and then she mumbles to herself.
 - Every few minutes (`acpPet.rotateMinutes`) the next character takes over, and the background changes with her.
 
-Only picture characters are used (the bundled DeepSeek-tan, Flandre and Remilia, and folders in `~/.acp-pet/skins` such as your own `hikari-art`). Backgrounds are read from `~/.acp-pet/backgrounds/<id>.png` (or `.webp`, `.jpg`) and are never copied into this repo. Use a cut-out with a transparent background, like doki-theme's; `python scripts/pets/cut_background.py art.jpg deepseek` removes a plain white backdrop (`--backdrop black` for black, `both` for both). For a full scene with no plain backdrop, use `--backdrop none --feather 0.15` so its edges fade out instead of ending in a box; if the figure runs off the bottom of the picture, add `--no-bottom` so pale skin there isn't taken for backdrop. `acpPet.editor.backgroundOpacity` sets how strongly the background shows (default 0.12, 0 hides it) and `acpPet.editor.height` sets her size.
+Only picture characters are used: the bundled DeepSeek-tan, Flandre, Remilia, Hikari and Nozomi (`hikari-art`, `nozomi-art`), plus any picture folders you add to `~/.acp-pet/skins`. Each bundled character comes with a background in `pets/<id>/background.png`. To use your own, put `~/.acp-pet/backgrounds/<id>.png` (or `.webp`, `.jpg`); it wins over the bundled one. Use a cut-out with a transparent background, like doki-theme's; `python scripts/pets/cut_background.py art.jpg deepseek` removes a plain white backdrop (`--backdrop black` for black, `both` for both). For a full scene with no plain backdrop, use `--backdrop none --feather 0.15` so its edges fade out instead of ending in a box; if the figure runs off the bottom of the picture, add `--no-bottom` so pale skin there isn't taken for backdrop. `acpPet.editor.backgroundOpacity` sets how strongly the background shows (default 0.12, 0 hides it) and `acpPet.editor.height` sets her size.
 
-This works by changing one of VS Code's own files (`workbench.html`): it adds one script line and a folder of pictures next to it, and updates the file's checksum in `product.json` so VS Code doesn't report a corrupt install. After a VS Code update the change is gone; the extension notices and offers to put it back. To undo it, run "ACP Pet: 把角色從編輯器移除" before uninstalling the extension.
+This works by changing one of VS Code's own files (`workbench.html`): it adds one script line and a folder of pictures next to it, and updates the file's checksum in `product.json` so VS Code doesn't report a corrupt install. After a VS Code update the change is gone; the extension notices and offers to put it back. To undo it, run "Kanban Musume: 把角色從編輯器移除" before uninstalling the extension.
 
 The VS Code pet keeps its own save file, `~/.acp-pet/vscode-save.json`, so its level is separate from the desktop pets.
 

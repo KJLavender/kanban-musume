@@ -1,4 +1,4 @@
-// ACP Pet for VS Code: the same brain, permission gate and acpx runner as the
+// Kanban Musume for VS Code: the same brain, permission gate and acpx runner as the
 // desktop app (src/core), shown in a sidebar webview instead of an Electron
 // window. Characters take turns every few minutes.
 
@@ -20,7 +20,7 @@ const CURRENT_KEY = "acpPet.current";
 const cfg = () => vscode.workspace.getConfiguration("acpPet");
 
 export async function activate(context: vscode.ExtensionContext) {
-  const out = vscode.window.createOutputChannel("ACP Pet");
+  const out = vscode.window.createOutputChannel("Kanban Musume");
   const log = (m: string) => out.appendLine(`[${new Date().toLocaleTimeString()}] ${m}`);
   context.subscriptions.push(out);
 
@@ -55,7 +55,7 @@ export async function activate(context: vscode.ExtensionContext) {
     if (!overlay.on || asked === p.id) return;
     asked = p.id;
     const choice = await vscode.window.showWarningMessage(
-      `ACP Pet:agent 想${p.title}${p.detail ? `
+      `看板娘:agent 想${p.title}${p.detail ? `
 ${p.detail}` : ""},可以嗎?`,
       "准",
       "不准",
@@ -118,17 +118,17 @@ ${p.detail}` : ""},可以嗎?`,
 
   async function feed() {
     const text = await vscode.window.showInputBox({
-      title: "ACP Pet",
+      title: "Kanban Musume",
       prompt: controller.busy ? "牠還在忙上一個任務" : "餵牠一個任務 (/demo 試演、/fail 失敗示範、/flow a >> b 接力)",
       placeHolder: "例如:幫我修好壞掉的測試",
     });
     if (!text?.trim()) return;
     if (!text.trim().startsWith("/") && !vscode.workspace.workspaceFolders?.length) {
-      void vscode.window.showWarningMessage("ACP Pet:先開一個資料夾,agent 會在那個資料夾裡工作。");
+      void vscode.window.showWarningMessage("看板娘:先開一個資料夾,agent 會在那個資料夾裡工作。");
       return;
     }
     if (controller.busy) {
-      void vscode.window.showInformationMessage("ACP Pet:牠還在忙,等這個任務做完再餵。");
+      void vscode.window.showInformationMessage("看板娘:她還在忙,等這個任務做完再餵。");
       return;
     }
     void vscode.commands.executeCommand("acpPet.view.focus");
@@ -140,7 +140,7 @@ ${p.detail}` : ""},可以嗎?`,
     const skins = await listSkins(dirs);
     const choice = await vscode.window.showQuickPick(
       skins.map((s) => ({ label: s.name, description: s.id, picked: s.id === skin?.id })),
-      { title: "ACP Pet:選擇角色" },
+      { title: "看板娘:選擇角色" },
     );
     if (choice) await show(choice.description, true);
   }
@@ -153,7 +153,7 @@ ${p.detail}` : ""},可以嗎?`,
       ...(controller.busy ? ([["$(stop) 取消目前任務", "acpPet.cancel"]] as [string, string][]) : []),
       ["$(gear) 設定…", "workbench.action.openSettings"],
     ];
-    const choice = await vscode.window.showQuickPick(items.map(([label]) => label), { title: "ACP Pet" });
+    const choice = await vscode.window.showQuickPick(items.map(([label]) => label), { title: "Kanban Musume" });
     const command = items.find(([label]) => label === choice)?.[1];
     if (command === "workbench.action.openSettings") void vscode.commands.executeCommand(command, "acpPet");
     else if (command) void vscode.commands.executeCommand(command);

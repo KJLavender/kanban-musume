@@ -1,7 +1,7 @@
 {
-  "name": "acp-pet",
+  "name": "kanban-musume",
   "version": "0.1.0",
-  "description": "A desktop pet that acts out what your ACP coding agent is doing, live.",
+  "description": "Anime mascots (看板娘) for coding: a desktop pet and a VS Code companion that act out what you and your coding agent are doing.",
   "private": true,
   "type": "module",
   "main": "dist/main.js",
