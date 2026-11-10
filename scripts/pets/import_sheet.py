@@ -5,9 +5,12 @@ feet-aligned, so switching poses doesn't make the pet jump around.
     python scripts/pets/import_sheet.py sheet.jpg hikari-art
     python scripts/pets/import_sheet.py sheet.png nozomi-art --name "望(插畫)" \\
         --grid 4x2 --poses idle,working,reading,typing,tugging,happy,sick,sleeping
+    python scripts/pets/import_sheet.py main.png my-pet \\
+        --also extra.png 4x2 bored,hammering,_,sulking   # "_" skips a cell
+        --also extra2.png 3x1 ref,bored,working          # "ref" only sets the scale
 
-Cells are read left-to-right, top-to-bottom. A caption under each cell
-(e.g. "idle.png") is detected and cut off. Output goes to
+Cells are read left-to-right, top-to-bottom. A caption under or over each
+cell (e.g. "idle.png") is detected and cut off. Output goes to
 ~/.acp-pet/skins/<skin> (or --out). Requires Pillow and numpy.
 """
 
@@ -31,24 +34,38 @@ def ink_mask(rgb: np.ndarray) -> np.ndarray:
     return (lo < 225) | (spread > 28)
 
 
+def _caption_rows(rows: np.ndarray, h: int) -> int | None:
+    """Scanning from row 0: if the first band of ink is a short caption sitting
+    above a white gap, return the row where the gap's middle is."""
+    y = 0
+    while y < h and not rows[y]:
+        y += 1
+    band_top = y
+    while y < h and rows[y]:
+        y += 1
+    band_bottom = y
+    gap = 0
+    while y < h and not rows[y]:
+        gap += 1
+        y += 1
+    if y < h and gap >= 3 and (band_bottom - band_top) < h * 0.12:
+        return band_bottom + gap // 2
+    return None
+
+
 def cut_caption(rgb: np.ndarray) -> np.ndarray:
-    """Drop a text caption at the bottom of a cell: the lowest band of ink rows
-    that sits below a white gap and is short compared to the cell."""
+    """Drop a text caption under (or over) a cell's figure: a short band of ink
+    rows separated from the figure by a white gap."""
     h = rgb.shape[0]
     rows = ink_mask(rgb).sum(axis=1) > 2
-    y = h - 1
-    while y > 0 and not rows[y]:
-        y -= 1
-    band_bottom = y
-    while y > 0 and rows[y]:
-        y -= 1
-    band_top = y
-    gap = 0
-    while y > 0 and not rows[y]:
-        gap += 1
-        y -= 1
-    if gap >= 3 and (band_bottom - band_top) < h * 0.12:
-        return rgb[: band_top - gap // 2]
+    cut = _caption_rows(rows[::-1], h)
+    if cut is not None:
+        rgb = rgb[: h - cut]
+    h = rgb.shape[0]
+    rows = ink_mask(rgb).sum(axis=1) > 2
+    cut = _caption_rows(rows, h)
+    if cut is not None:
+        rgb = rgb[cut:]
     return rgb
 
 
@@ -121,35 +138,63 @@ def remove_background(rgb: np.ndarray) -> Image.Image:
     return img
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("sheet")
-    ap.add_argument("skin", help="skin folder name, e.g. hikari-art")
-    ap.add_argument("--grid", default="4x2", help="COLSxROWS (default 4x2)")
-    ap.add_argument("--poses", default=DEFAULT_POSES, help="comma-separated pose names, in cell order")
-    ap.add_argument("--name", help="display name shown in the Looks menu")
-    ap.add_argument("--out", default=str(Path.home() / ".acp-pet" / "skins"))
-    ap.add_argument("--margin", type=int, default=6, help="transparent padding around the pose")
-    args = ap.parse_args()
-
-    cols, rows = (int(v) for v in args.grid.lower().split("x"))
-    poses = [p.strip() for p in args.poses.split(",") if p.strip()]
+def cut_sheet(path: str, grid: str, poses: list[str], scale: float | None, ref_width: int | None) -> dict[str, Image.Image]:
+    """Cut one sheet into {pose: cropped RGBA}. "_" in poses skips that cell;
+    "ref" cells come back as ref0, ref1... (used for scaling, never saved).
+    Extra sheets are first rescaled to the first sheet's width."""
+    cols, rows = (int(v) for v in grid.lower().split("x"))
     if len(poses) > cols * rows:
-        raise SystemExit(f"{len(poses)} poses but only {cols * rows} cells")
-
-    sheet = np.array(Image.open(args.sheet).convert("RGB")).astype(np.int16)
+        raise SystemExit(f"{path}: {len(poses)} poses but only {cols * rows} cells")
+    src = Image.open(path).convert("RGB")
+    if scale is None and ref_width:
+        scale = ref_width / src.width
+    if scale and abs(scale - 1) > 0.01:
+        src = src.resize((round(src.width * scale), round(src.height * scale)), Image.LANCZOS)
+    sheet = np.array(src).astype(np.int16)
     sh, sw, _ = sheet.shape
     cw, ch = sw // cols, sh // rows
-
-    cutouts: dict[str, Image.Image] = {}
+    out: dict[str, Image.Image] = {}
     for i, pose in enumerate(poses):
+        if pose == "_":
+            continue
+        if pose == "ref":
+            pose = f"ref{i}"
         cx, cy = (i % cols) * cw, (i // cols) * ch
         cell = cut_caption(sheet[cy : cy + ch, cx : cx + cw])
         img = remove_background(cell)
         box = img.getchannel("A").point(lambda a: 255 if a > 24 else 0).getbbox()
         if not box:
-            raise SystemExit(f"cell {i + 1} ({pose}) came out empty")
-        cutouts[pose] = img.crop(box)
+            raise SystemExit(f"{path}: cell {i + 1} ({pose}) came out empty")
+        out[pose] = img.crop(box)
+    return out
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("sheet")
+    ap.add_argument("skin", help="skin folder name, e.g. hikari-art")
+    ap.add_argument("--grid", default="4x2", help="COLSxROWS (default 4x2)")
+    ap.add_argument("--poses", default=DEFAULT_POSES, help='comma-separated pose names, in cell order; "_" skips a cell, "ref" only sets the scale')
+    ap.add_argument("--also", nargs=3, action="append", default=[], metavar=("SHEET", "GRID", "POSES"),
+                    help="another sheet for the same skin (same layout, any resolution); repeatable")
+    ap.add_argument("--name", help="display name shown in the Looks menu")
+    ap.add_argument("--out", default=str(Path.home() / ".acp-pet" / "skins"))
+    ap.add_argument("--margin", type=int, default=6, help="transparent padding around the pose")
+    args = ap.parse_args()
+
+    split = lambda text: [p.strip() for p in text.split(",") if p.strip()]  # noqa: E731
+    cutouts = cut_sheet(args.sheet, args.grid, split(args.poses), 1.0, None)
+    ref_width = Image.open(args.sheet).width
+    # Generators draw the character at a different size on every sheet, so
+    # match each extra sheet to the first by median figure height.
+    base_h = float(np.median([c.height for c in cutouts.values()]))
+    for sheet, grid, poses in args.also:
+        extra = cut_sheet(sheet, grid, split(poses), None, ref_width)
+        k = base_h / float(np.median([c.height for c in extra.values()]))
+        for pose, c in extra.items():
+            if pose.startswith("ref"):
+                continue
+            cutouts[pose] = c.resize((round(c.width * k), round(c.height * k)), Image.LANCZOS) if abs(k - 1) > 0.02 else c
 
     # One canvas size for every pose, feet on the same baseline.
     m = args.margin

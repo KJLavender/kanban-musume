@@ -77,6 +77,22 @@ npm start         # 正式使用
 - 改了腳本想重畫,執行 `npm run pets:draw`,需要 Python 和 Pillow。
 - 這些是同人二創,詳見 [ASSETS-LICENSE.md](ASSETS-LICENSE.md)。角色版權屬於 NEXON Games 和 Yostar,圖片僅限非商業使用。
 
+## DeepSeek娘、芙蘭朵露與蕾米莉亞
+
+另外內建三隻:DeepSeek娘(穿女僕裝的鯨魚女孩,是 DeepSeek 模型的同人看板娘),以及《東方 Project》的斯卡雷特姊妹:芙蘭朵露和蕾米莉亞。在選單的「外表」裡選。
+
+<p align="center"><img src="docs/guests.png" width="100%" alt="DeepSeek娘、芙蘭朵露、蕾米莉亞的待機、讀檔、打字、要權限、開心、思考"></p>
+
+這三隻是「圖片外表」,不是 sprite sheet:`pets/<id>/` 裡每個動作一張 PNG,所以不會轉頭、也沒有逐格動畫,改用跳、抖、搖來表現。圖是用 AI 產圖工具照「動作格子圖」的 prompt 產生,再用 `scripts/pets/import_sheet.py` 切開。原始格子圖放在 `scripts/pets/sheets/`。重新產生的方式:
+
+```bash
+python scripts/pets/import_sheet.py scripts/pets/sheets/flandre-main.jpg flandre --out pets --name "フランドール" \
+    --poses idle,reading,typing,tugging,happy,sick,sleeping,thinking \
+    --also scripts/pets/sheets/flandre-extra.jpg 4x2 _,hammering,peeking,_,sulking,_,levelup \n    --also scripts/pets/sheets/flandre-extra2.jpg 4x2 ref,bored,working,_,ref
+```
+
+`--also` 會把第二張格子圖加進同一個外表,並把角色縮放成跟第一張一樣大;`_` 代表跳過那一格,`ref` 代表這格只拿來對齊大小、不輸出。這些是同人二創,僅限非商業使用,詳見 [ASSETS-LICENSE.md](ASSETS-LICENSE.md)。
+
 ## 多隻寵物與比賽
 
 選單的「新增一隻寵物」會在桌面多放一隻。每隻都有自己的 agent、workspace、外表和存檔。「比賽」會把同一個任務同時丟給所有閒著的寵物,最先完成的拿到獎盃和 15 點額外 XP,其他的生悶氣。想讓不同的 agent 互相比,就在設定檔裡給每隻寵物填不同的 `agent`。
@@ -96,7 +112,7 @@ npm start         # 正式使用
 
 選單的「外表」可以換寵物的樣子。共有三種:
 
-1. 內建外表:ヒカリ、ノゾミ,以及五種顏色的程式小雞(小黃雞、雪白鴨、薄荷史萊姆、櫻花雞、夜貓)。小雞有手繪的道具,例如書、鍵盤、榔頭。
+1. 內建外表:ヒカリ、ノゾミ、DeepSeek娘、芙蘭朵露、蕾米莉亞,以及五種顏色的程式小雞(小黃雞、雪白鴨、薄荷史萊姆、櫻花雞、夜貓)。小雞有手繪的道具,例如書、鍵盤、榔頭。
 2. 你自己的圖片。在 `~/.acp-pet/skins/` 建一個資料夾,每個動作放一張圖。支援 PNG、GIF(動畫也可以)、WebP、JPG。只有 `idle` 是必要的,缺少的動作會自動換用別的動作:
 
    ```
@@ -167,8 +183,8 @@ acpx runtime ─ AcpRuntimeEvent ─▶ AcpEventNormalizer ─ PetEvent ─▶ P
 | `src/core/fake-source.ts` | `/demo` 和 `/fail` 用的腳本演出 |
 | `src/main/` | Electron 端:每隻寵物一個透明、可穿透點擊的視窗,還有托盤、選單、設定 |
 | `src/renderer/` | 用程式畫的像素 sprite、外表顯示、對話框、權限牌、唸台詞 |
-| `pets/` | 內附的角色包(ヒカリ和ノゾミ,插畫版與像素版) |
-| `scripts/pets/` | 畫寵物 sprite sheet 的 Python 腳本 |
+| `pets/` | 內附的寵物:ヒカリ和ノゾミ(插畫版與像素版),DeepSeek娘、芙蘭朵露、蕾米莉亞(圖片外表) |
+| `scripts/pets/` | 畫雙胞胎 sprite sheet、把動作格子圖切成圖片外表的 Python 腳本 |
 
 ## 測試
 

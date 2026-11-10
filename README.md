@@ -77,6 +77,22 @@ Both are Codex pet packs in the v2 format: `pets/<id>/pet.json` plus an 8x11 `sp
 - To redraw them after editing the scripts, run `npm run pets:draw`. This needs Python with Pillow.
 - They are fan art. See [ASSETS-LICENSE.md](ASSETS-LICENSE.md). The characters belong to NEXON Games and Yostar, and the sprites are for non-commercial use.
 
+## DeepSeek-tan, Flandre and Remilia
+
+Three more pets come built in: DeepSeek-tan (a whale girl in a maid dress, a fan mascot of the DeepSeek model) and the Scarlet sisters from Touhou Project, Flandre and Remilia. Pick them under the 外表 menu.
+
+<p align="center"><img src="docs/guests.png" width="100%" alt="DeepSeek-tan, Flandre and Remilia idle, reading, typing, asking, cheering and thinking"></p>
+
+These are picture skins, not sprite sheets: one PNG per pose in `pets/<id>/`, so they don't turn their heads or animate frame by frame. Instead the pet hops, shakes and sways. The pictures were made with an image generator from a pose-grid prompt, then cut up by `scripts/pets/import_sheet.py`. The source grids are in `scripts/pets/sheets/`. To rebuild one:
+
+```bash
+python scripts/pets/import_sheet.py scripts/pets/sheets/flandre-main.jpg flandre --out pets --name "フランドール" \
+    --poses idle,reading,typing,tugging,happy,sick,sleeping,thinking \
+    --also scripts/pets/sheets/flandre-extra.jpg 4x2 _,hammering,peeking,_,sulking,_,levelup \n    --also scripts/pets/sheets/flandre-extra2.jpg 4x2 ref,bored,working,_,ref
+```
+
+`--also` adds a second grid to the same skin and scales it to match the first; `_` skips a cell, and `ref` marks a plain standing pose used only to match the size. They are fan art for non-commercial use, see [ASSETS-LICENSE.md](ASSETS-LICENSE.md).
+
 ## Several pets and racing
 
 The 新增一隻寵物 menu item adds another pet to the desktop. Each pet has its own agent, workspace, look and save file. The 比賽 item sends the same task to every idle pet at once. The first to finish gets a trophy and 15 bonus XP, and the others sulk. To race different agents against each other, give each pet a different `agent` in the config.
@@ -96,7 +112,7 @@ They stay put while working, while holding a permission sign, while being dragge
 
 The 外表 menu switches a pet's appearance. There are three kinds:
 
-1. Built-in looks: Hikari and Nozomi, plus the code-drawn chick in five colors (chick, snow, mint, sakura, night). The chicks come with hand-drawn props such as a book, keyboard and hammer.
+1. Built-in looks: Hikari and Nozomi, DeepSeek-tan, Flandre and Remilia, plus the code-drawn chick in five colors (chick, snow, mint, sakura, night). The chicks come with hand-drawn props such as a book, keyboard and hammer.
 2. Your own pictures. Make a folder in `~/.acp-pet/skins/` with one image per pose. PNG, GIF (animated is fine), WebP and JPG all work. Only `idle` is required. Missing poses fall back to another pose:
 
    ```
@@ -167,8 +183,8 @@ acpx runtime ─ AcpRuntimeEvent ─▶ AcpEventNormalizer ─ PetEvent ─▶ P
 | `src/core/fake-source.ts` | Scripted turns for `/demo` and `/fail` |
 | `src/main/` | Electron side: one transparent click-through window per pet, tray, menus, settings |
 | `src/renderer/` | Pixel sprite drawn in code, skin rendering, speech bubble, permission sign, read-aloud |
-| `pets/` | Bundled pet packs (Hikari and Nozomi, illustrated and pixel) |
-| `scripts/pets/` | Python scripts that draw the pet sprite sheets |
+| `pets/` | Bundled pets: Hikari and Nozomi (illustrated and pixel), DeepSeek-tan, Flandre and Remilia (pictures) |
+| `scripts/pets/` | Python scripts that draw the twins' sprite sheets and cut pose grids into picture skins |
 
 ## Tests
 
