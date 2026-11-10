@@ -69,6 +69,8 @@ const REACTIONS: ReadonlySet<PetState> = new Set(["happy", "sick", "sulking", "l
 const POKES_TO_ANNOY = 5;
 const POKE_WINDOW_MS = 4000;
 const RESTING: ReadonlySet<PetState> = new Set(["idle", "bored", "sleeping"]);
+/** Poses mirror() may hold; they fall back to idle when the hold runs out. */
+const MIRRORED: ReadonlySet<PetState> = new Set(["thinking", "reading", "typing", "hammering", "peeking"]);
 
 /** The heart of the project: which animation a tool call becomes. */
 export function stateForTool(kind: ToolKind | undefined, title: string): PetState {
@@ -146,6 +148,7 @@ export class PetBrain {
     switch (ev.type) {
       case "turn_start":
         this.busy = true;
+        this.mirrorUntil = 0;
         this.seenTools.clear();
         this.needs.boredom = 0;
         this.go("thinking", lineFor("thinking", this.rng), now, true);
@@ -243,6 +246,21 @@ export class PetBrain {
     }
   }
 
+  /** Until when a mirror() pose is held; 0 when none. */
+  private mirrorUntil = 0;
+
+  /**
+   * Act out what the *user* is doing (typing in the editor, running a task…)
+   * for `holdMs`. The agent comes first: ignored while a turn or a permission
+   * sign is up. Reactions (happy, sick) expire on their own as usual.
+   */
+  mirror(state: PetState, line: string | null, now: number, holdMs = 3000): void {
+    if (this.busy || this.permission) return;
+    this.needs.boredom = clamp(this.needs.boredom - 1);
+    this.mirrorUntil = MIRRORED.has(state) ? now + holdMs : 0;
+    if (state !== this.state || line) this.go(state, line, now, true);
+  }
+
   /** Recent touch times, to notice being poked over and over. */
   private touches: number[] = [];
 
@@ -275,6 +293,11 @@ export class PetBrain {
       const { state, line } = this.pending;
       this.pending = null;
       this.set(state, line, now);
+    }
+
+    if (this.mirrorUntil && now >= this.mirrorUntil) {
+      this.mirrorUntil = 0;
+      if (!this.busy && MIRRORED.has(this.state)) this.set("idle", null, now);
     }
 
     if (REACTIONS.has(this.state) && now - this.since >= this.reactionMs) {

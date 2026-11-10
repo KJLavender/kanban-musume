@@ -138,6 +138,34 @@ The 外表 menu switches a pet's appearance. There are three kinds:
 
 The menu re-reads the folder each time it opens, so new skins show up without a restart. Images over 8 MB, and paths that point outside the skin folder, are refused.
 
+## In VS Code
+
+There is also a VS Code version in `vscode/`. The pet lives in a panel called ACP Pet at the bottom of the Explorer sidebar, and the characters take turns: every 5 minutes the next one comes on and says hello. It never switches in the middle of a task or while a permission sign is up.
+
+What it reacts to:
+
+- Your own editing: it types along while you type, gets sick when new errors show up and cheers when they are all fixed, hammers while a task runs, and looks through its telescope while you debug.
+- Tasks for the agent: run "ACP Pet: 餵任務給寵物" from the Command Palette, or double-click the pet. The agent works in the first folder you have open. Unlike the desktop app, this is your real project, so the permission sign matters: edits and commands still need your Allow in the panel.
+- Clicks: same as on the desktop (head pat, cheek poke). Right-click opens a small menu.
+
+It is not on the Marketplace yet. To try it from this repo:
+
+```bash
+npm install
+npm run vscode:build
+code --extensionDevelopmentPath="$PWD/vscode"
+```
+
+That opens a second VS Code window with the extension loaded. Settings (search for `acpPet`):
+
+- `acpPet.characters`: which skins take turns, in order. Default: `hikari`, `nozomi`, `deepseek`, `flandre`, `remilia`. Folders in `~/.acp-pet/skins` work too.
+- `acpPet.rotateMinutes`: minutes between switches. `0` keeps the current character.
+- `acpPet.agent`: the acpx agent for tasks, `claude` by default. After changing it, reload the window.
+- `acpPet.reactToEditor`: turn off the reactions to your own editing.
+- `acpPet.permissionTimeoutSec`: seconds before an unanswered sign counts as Deny.
+
+The VS Code pet keeps its own save file, `~/.acp-pet/vscode-save.json`, so its level is separate from the desktop pets.
+
 ## Configuration
 
 On first launch the app writes `~/.acp-pet/config.json`:
@@ -197,12 +225,14 @@ acpx runtime ─ AcpRuntimeEvent ─▶ AcpEventNormalizer ─ PetEvent ─▶ P
 | `src/renderer/` | Pixel sprite drawn in code, skin rendering, speech bubble, permission sign, read-aloud |
 | `pets/` | Bundled pets: Hikari and Nozomi (illustrated and pixel), DeepSeek-tan, Flandre and Remilia (pictures) |
 | `scripts/pets/` | Python scripts that draw the twins' sprite sheets and cut pose grids into picture skins |
+| `vscode/` | The VS Code extension: sidebar webview, character rotation, editor reactions. Reuses `src/core` |
 
 ## Tests
 
 ```bash
 npm test          # unit and integration tests
 npm run smoke     # starts the real Electron app and runs about 30 checks; screenshots go to smoke-out/
+npm run vscode:test   # opens the extension in your installed VS Code with a throwaway profile and checks the panel, rotation, typing and a /demo task
 ACP_PET_LIVE=1 npx vitest run test/live.test.ts   # drives a real agent in a temp folder: one turn and a two-step relay (uses your agent quota)
 ```
 
@@ -211,6 +241,7 @@ ACP_PET_LIVE=1 npx vitest run test/live.test.ts   # drives a real agent in a tem
 - [acpx](https://github.com/openclaw/acpx): the ACP runtime
 - [qq-slime-pet](https://github.com/DTSFO/qq-slime-pet): sprites drawn in code, and the click-through hit-test trick
 - [Shimeji](https://kilkakon.com/shimeji/): the idea of desktop pets that wander on their own
+- [vscode-pets](https://github.com/tonybaloney/vscode-pets) and [doki-theme-vscode](https://github.com/doki-theme/doki-theme-vscode): ideas for a pet and characters inside VS Code
 - [awesome-codex-pet](https://github.com/legeling/awesome-codex-pet): the Codex pet v2 format
 - [OpenPet](https://github.com/dengyie/OpenPet): the Codex pet pack layout
 - [codex-has-a-pet-too](https://github.com/ChenxiChu001/codex-has-a-pet-too) and [miku-on-desktop](https://github.com/thunguo/miku-on-desktop): other agent pets that inspired this one

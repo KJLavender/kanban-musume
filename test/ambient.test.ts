@@ -76,7 +76,7 @@ describe("planAmbient", () => {
       expect(act.toX).toBeGreaterThanOrEqual(0);
       expect(act.toX).toBeLessThanOrEqual(1920 - 320);
       expect(Math.abs(act.toX - p.x)).toBeGreaterThanOrEqual(60);
-      expect(Math.abs(act.toX - p.x)).toBeLessThanOrEqual(380);
+      expect(Math.abs(act.toX - p.x)).toBeLessThanOrEqual(380.5); // toX is rounded to a whole pixel
     }
   });
 

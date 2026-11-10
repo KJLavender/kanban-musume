@@ -138,6 +138,34 @@ python scripts/pets/import_sheet.py scripts/pets/sheets/flandre-main.jpg flandre
 
 選單每次打開都會重新讀取資料夾,新加的外表不用重開就會出現。超過 8 MB 的圖片,以及指到外表資料夾之外的路徑,都會被拒絕。
 
+## 在 VS Code 裡
+
+`vscode/` 裡還有一個 VS Code 版。寵物住在檔案總管側邊欄最下面的「ACP Pet」面板,而且角色會輪流上場:每 5 分鐘換下一個,上場時會打招呼。任務做到一半或舉著權限牌時不會換。
+
+牠會對這些事情有反應:
+
+- 你自己的編輯:你打字牠跟著打字,出現新的錯誤會生病、錯誤全部清掉會開心,跑 task 時敲榔頭,偵錯時拿望遠鏡。
+- 給 agent 的任務:在指令面板執行「ACP Pet: 餵任務給寵物」,或在寵物上雙擊。agent 會在你開的第一個資料夾裡工作。跟桌面版不同,這是你真正的專案,所以權限牌很重要:修改檔案和執行指令一樣要你在面板裡按「准」。
+- 點擊:跟桌面版一樣(摸頭、戳臉頰)。按右鍵會開一個小選單。
+
+目前還沒上架 Marketplace。從這個 repo 試用:
+
+```bash
+npm install
+npm run vscode:build
+code --extensionDevelopmentPath="$PWD/vscode"
+```
+
+這會另外開一個載入了擴充套件的 VS Code 視窗。設定(搜尋 `acpPet`):
+
+- `acpPet.characters`:輪流上場的外表,照順序。預設是 `hikari`、`nozomi`、`deepseek`、`flandre`、`remilia`。`~/.acp-pet/skins` 裡的資料夾也可以用。
+- `acpPet.rotateMinutes`:幾分鐘換一次。`0` 代表不換。
+- `acpPet.agent`:跑任務的 acpx agent,預設 `claude`。改了之後要重新載入視窗。
+- `acpPet.reactToEditor`:關掉對你自己編輯動作的反應。
+- `acpPet.permissionTimeoutSec`:權限牌幾秒沒回應就當作「不准」。
+
+VS Code 版的寵物有自己的存檔 `~/.acp-pet/vscode-save.json`,等級跟桌面版的寵物分開算。
+
 ## 設定
 
 第一次啟動時,程式會寫出 `~/.acp-pet/config.json`:
@@ -197,12 +225,14 @@ acpx runtime ─ AcpRuntimeEvent ─▶ AcpEventNormalizer ─ PetEvent ─▶ P
 | `src/renderer/` | 用程式畫的像素 sprite、外表顯示、對話框、權限牌、唸台詞 |
 | `pets/` | 內附的寵物:ヒカリ和ノゾミ(插畫版與像素版),DeepSeek娘、芙蘭朵露、蕾米莉亞(圖片外表) |
 | `scripts/pets/` | 畫雙胞胎 sprite sheet、把動作格子圖切成圖片外表的 Python 腳本 |
+| `vscode/` | VS Code 擴充套件:側邊欄 webview、角色輪替、對編輯動作的反應。共用 `src/core` |
 
 ## 測試
 
 ```bash
 npm test          # 單元與整合測試
 npm run smoke     # 啟動真正的 Electron 程式並跑約 30 項檢查,截圖放在 smoke-out/
+npm run vscode:test   # 用你裝好的 VS Code、搭配用完即丟的設定檔開啟擴充套件,檢查面板、換角色、打字反應和一次 /demo 任務
 ACP_PET_LIVE=1 npx vitest run test/live.test.ts   # 在暫存資料夾驅動真的 agent:一個 turn 加一次兩步的接力(會用掉 agent 額度)
 ```
 
@@ -211,6 +241,7 @@ ACP_PET_LIVE=1 npx vitest run test/live.test.ts   # 在暫存資料夾驅動真�
 - [acpx](https://github.com/openclaw/acpx):ACP runtime
 - [qq-slime-pet](https://github.com/DTSFO/qq-slime-pet):用程式畫 sprite,以及點擊穿透的判斷技巧
 - [Shimeji](https://kilkakon.com/shimeji/):桌寵自己走動的點子
+- [vscode-pets](https://github.com/tonybaloney/vscode-pets) 和 [doki-theme-vscode](https://github.com/doki-theme/doki-theme-vscode):在 VS Code 裡放寵物和角色的點子
 - [awesome-codex-pet](https://github.com/legeling/awesome-codex-pet):Codex pet v2 格式
 - [OpenPet](https://github.com/dengyie/OpenPet):Codex 角色包的資料夾結構
 - [codex-has-a-pet-too](https://github.com/ChenxiChu001/codex-has-a-pet-too) 和 [miku-on-desktop](https://github.com/thunguo/miku-on-desktop):啟發這個專案的其他 agent 寵物

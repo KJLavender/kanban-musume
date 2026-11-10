@@ -213,6 +213,25 @@ describe("PetBrain", () => {
     expect(c.tick(35_000).state).toBe("happy");
   });
 
+  it("mirrors the user's editing for a moment, then goes back to idle", () => {
+    const b = fresh();
+    b.mirror("typing", null, 0, 2000);
+    expect(b.tick(1000).state).toBe("typing");
+    b.mirror("typing", null, 1500, 2000); // still typing: the hold is extended
+    expect(b.tick(3000).state).toBe("typing");
+    expect(b.tick(3600).state).toBe("idle");
+  });
+
+  it("the agent's turn wins over mirrored editor activity", () => {
+    const b = fresh();
+    b.handle({ type: "turn_start", prompt: "hi" }, 0);
+    b.mirror("typing", null, 10);
+    expect(b.tick(10).state).toBe("thinking");
+    b.handle({ type: "turn_end", outcome: "completed" }, 5000);
+    b.mirror("sick", "出現錯誤了…", 6000);
+    expect(b.tick(6000)).toMatchObject({ state: "sick", line: "出現錯誤了…" });
+  });
+
   it("won't nap or celebrate a pat while a turn is running", () => {
     const b = fresh();
     b.handle({ type: "turn_start", prompt: "hi" }, 0);

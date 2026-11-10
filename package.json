@@ -13,7 +13,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "pets:draw": "python scripts/pets/draw_twins_hd.py --preview && python scripts/pets/draw_twins.py --preview",
-    "pets:install-codex": "node scripts/install-codex-pets.mjs"
+    "pets:install-codex": "node scripts/install-codex-pets.mjs",
+    "vscode:build": "node vscode/build.mjs",
+    "vscode:test": "npm run vscode:build && node scripts/test-vscode.mjs"
   },
   "license": "MIT",
   "dependencies": {
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
+    "@types/vscode": "~1.90.0",
     "electron": "^44.5.1",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",

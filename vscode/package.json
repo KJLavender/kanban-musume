@@ -1,0 +1,70 @@
+{
+  "name": "acp-pet-vscode",
+  "displayName": "ACP Pet",
+  "description": "A pet in your sidebar that acts out your editing and your coding agent's work, and takes turns between characters.",
+  "version": "0.1.0",
+  "publisher": "KJLavender",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.cjs",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "acpPet.view",
+          "name": "ACP Pet"
+        }
+      ]
+    },
+    "commands": [
+      { "command": "acpPet.feed", "title": "餵任務給寵物 (Give the pet a task)", "category": "ACP Pet" },
+      { "command": "acpPet.cancel", "title": "取消目前任務 (Cancel the task)", "category": "ACP Pet" },
+      { "command": "acpPet.next", "title": "換下一個角色 (Next character)", "category": "ACP Pet" },
+      { "command": "acpPet.pick", "title": "選擇角色… (Pick a character)", "category": "ACP Pet" }
+    ],
+    "configuration": {
+      "title": "ACP Pet",
+      "properties": {
+        "acpPet.characters": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["hikari", "nozomi", "deepseek", "flandre", "remilia"],
+          "description": "Skin ids that take turns. Bundled: hikari, nozomi, deepseek, flandre, remilia, their -pixel versions, and the chicks (chick, snow, mint, sakura, night). Folders in ~/.acp-pet/skins work too."
+        },
+        "acpPet.rotateMinutes": {
+          "type": "number",
+          "default": 5,
+          "minimum": 0,
+          "description": "Switch to the next character every N minutes. 0 keeps the current one."
+        },
+        "acpPet.agent": {
+          "type": "string",
+          "default": "claude",
+          "description": "acpx agent that runs tasks you give the pet (claude, codex, gemini…). It must already be installed and logged in."
+        },
+        "acpPet.reactToEditor": {
+          "type": "boolean",
+          "default": true,
+          "description": "Act out your own editing too: typing, saving, errors, tasks and debugging."
+        },
+        "acpPet.permissionTimeoutSec": {
+          "type": "number",
+          "default": 60,
+          "minimum": 5,
+          "description": "Seconds before an unanswered permission sign counts as Deny."
+        }
+      }
+    }
+  }
+}

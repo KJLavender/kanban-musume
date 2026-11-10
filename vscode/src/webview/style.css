@@ -1,0 +1,96 @@
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  user-select: none;
+  color: var(--vscode-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+}
+.hidden { display: none !important; }
+
+#stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 8px 6px;
+  min-height: 100vh;
+  justify-content: flex-end;
+}
+
+#art {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  max-width: 260px;
+  height: 230px;
+  cursor: pointer;
+}
+#pet { width: 192px; height: 208px; max-width: 100%; object-fit: contain; image-rendering: auto; }
+#art[data-type="pixel"] #pet { width: 200px; height: 180px; image-rendering: pixelated; }
+#pet-img { max-width: 100%; max-height: 230px; object-fit: contain; pointer-events: none; }
+#art.pixelated #pet, #art.pixelated #pet-img { image-rendering: pixelated; }
+#art.swap { animation: swap 0.5s ease-out; }
+
+/* Picture skins have no hand-drawn props: poses get motion, and a badge when generic. */
+#art.pose-happy #pet-img, #art.pose-levelup #pet-img, #art.pose-tugging #pet-img { animation: hop 0.35s ease-in-out infinite alternate; }
+#art.pose-typing #pet-img, #art.pose-hammering #pet-img { animation: jitter 0.15s steps(2) infinite; }
+#art.pose-thinking #pet-img, #art.pose-reading #pet-img, #art.pose-peeking #pet-img { animation: sway 1.2s ease-in-out infinite alternate; }
+#art.generic.pose-sick #pet-img { filter: grayscale(0.8) brightness(0.9); }
+#art.generic.pose-sleeping #pet-img { filter: brightness(0.8); }
+#art.generic.pose-sulking #pet-img { transform: scaleX(-1); filter: saturate(0.6); }
+
+#badge, #progress {
+  position: absolute;
+  top: 4px;
+  font-size: 20px;
+  background: var(--vscode-editorWidget-background);
+  border: 1px solid var(--vscode-editorWidget-border, transparent);
+  border-radius: 12px;
+  padding: 0 6px;
+}
+#badge { right: 4px; }
+#progress { left: 4px; font-size: 12px; line-height: 22px; }
+
+#bubble, #sign {
+  width: 100%;
+  max-width: 280px;
+  background: var(--vscode-editorWidget-background);
+  border: 1px solid var(--vscode-editorWidget-border, var(--vscode-focusBorder));
+  border-radius: 8px;
+  padding: 6px 10px;
+  animation: pop 0.15s ease-out;
+  word-break: break-word;
+}
+#bubble code, #sign code {
+  font-family: var(--vscode-editor-font-family);
+  background: var(--vscode-textCodeBlock-background);
+  border-radius: 3px;
+  padding: 0 3px;
+}
+.sign-title { font-weight: bold; margin-bottom: 4px; }
+#sign-detail { display: block; margin: 4px 0; white-space: pre-wrap; max-height: 6em; overflow: auto; }
+.sign-row { display: flex; gap: 6px; align-items: center; }
+.sign-row button {
+  border: none;
+  border-radius: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  color: var(--vscode-button-foreground);
+  background: var(--vscode-button-background);
+}
+.sign-row button:hover { background: var(--vscode-button-hoverBackground); }
+.sign-row button.secondary { color: var(--vscode-button-secondaryForeground); background: var(--vscode-button-secondaryBackground); }
+#sign-timer { margin-left: auto; opacity: 0.7; font-size: 11px; }
+
+#status { opacity: 0.7; font-size: 11px; text-align: center; }
+
+@keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes swap { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes hop { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+@keyframes jitter { from { transform: translateX(-1px); } to { transform: translateX(1px); } }
+@keyframes sway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
