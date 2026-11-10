@@ -41,8 +41,9 @@ function save(patch: Saved) {
 const pick = <T>(xs: readonly T[]): T => xs[Math.floor(Math.random() * xs.length)]!;
 
 const CSS = `
-#acp-pet-bg { position: fixed; inset: 0; pointer-events: none; z-index: 20; background-repeat: no-repeat;
-  background-size: contain; background-position: right center; transition: opacity 1.2s ease; }
+#acp-pet-bg { position: fixed; right: 0; top: 0; height: 100%; max-width: 100%; object-fit: contain;
+  object-position: right center; pointer-events: none; z-index: 20; transition: opacity 1.2s ease;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 35%); mask-image: linear-gradient(to right, transparent, #000 35%); }
 #acp-pet { position: fixed; z-index: 21; pointer-events: none; display: flex; flex-direction: column;
   align-items: flex-end; transition: opacity 0.6s ease; }
 #acp-pet.fading { opacity: 0; }
@@ -72,8 +73,11 @@ function start(cfg: OverlayConfig) {
   style.textContent = CSS;
   document.head.appendChild(style);
 
-  const bg = document.createElement("div");
+  // An <img>, not a CSS background, so its own left edge can fade out (no hard
+  // box where a white-backed illustration ends).
+  const bg = document.createElement("img");
   bg.id = "acp-pet-bg";
+  bg.alt = "";
   const wrap = document.createElement("div");
   wrap.id = "acp-pet";
   const bubble = document.createElement("div");
@@ -84,6 +88,18 @@ function start(cfg: OverlayConfig) {
   img.style.height = `${cfg.height}px`;
   wrap.append(bubble, img);
   document.body.append(bg, wrap);
+  // Move into the workbench once it exists: there, notifications, menus and the
+  // command palette stack above the pet instead of being covered by it.
+  const adopt = () => {
+    const bench = document.querySelector(".monaco-workbench");
+    if (!bench) return false;
+    bench.append(bg, wrap);
+    return true;
+  };
+  if (!adopt()) {
+    const watch = new MutationObserver(() => adopt() && watch.disconnect());
+    watch.observe(document.body, { childList: true });
+  }
 
   const saved = load();
   const place = (right: number, bottom: number) => {
@@ -124,7 +140,8 @@ function start(cfg: OverlayConfig) {
 
   function showCharacter(c: OverlayCharacter) {
     char = c;
-    bg.style.backgroundImage = c.background ? `url("${url(c.background)}")` : "none";
+    if (c.background) bg.src = url(c.background);
+    else bg.removeAttribute("src");
     bg.style.opacity = c.background ? String(cfg.backgroundOpacity) : "0";
     setPose("idle");
   }
