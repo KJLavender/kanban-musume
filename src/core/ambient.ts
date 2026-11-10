@@ -78,6 +78,9 @@ const MUMBLES_BY: Record<string, readonly string[]> = {
   remilia: ["真是悠閒的一天。", "紅茶涼了…", "(優雅地整理帽子)", "我可是紅魔館的主人。", "命運的線…看見了。"],
 };
 
+/** A character's own mumbles (by skin id, "-art"/"-pixel" suffixes ignored), or the generic ones. */
+export const mumblesFor = (skinId: string): readonly string[] => MUMBLES_BY[skinId.replace(/-.*$/, "")] ?? MUMBLES;
+
 const CHEERS = ["加油~", "主人打字好快!", "我在旁邊陪你", "(安靜地看著你打字)", "寫完要休息一下喔"];
 
 type Speaker = string | { name: string; skin?: string };

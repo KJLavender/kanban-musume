@@ -13,6 +13,7 @@ import { loadSave } from "../../src/core/store.js";
 import { petHome, skinsDir } from "../../src/main/config.js";
 import { watchEditor } from "./editor-watch.js";
 import { helloFor, nextCharacter } from "./rotation.js";
+import { registerOverlayCommands } from "./overlay/commands.js";
 import { PetViewProvider } from "./view.js";
 
 const CURRENT_KEY = "acpPet.current";
@@ -154,6 +155,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("acpPet.cancel", () => controller.cancel()),
     vscode.commands.registerCommand("acpPet.next", () => next()),
     vscode.commands.registerCommand("acpPet.pick", pick),
+    registerOverlayCommands(context, dirs, log),
     watchEditor(mirror, () => cfg().get<boolean>("reactToEditor", true)),
     {
       dispose: () => {

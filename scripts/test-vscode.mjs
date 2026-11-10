@@ -19,7 +19,8 @@ const r = spawnSync(
   code,
   [
     join(tmp, "workspace"),
-    `--extensionDevelopmentPath=${resolve("vscode")}`,
+    // EXT_PATH lets the same suite check an unpacked .vsix instead of the source folder.
+    `--extensionDevelopmentPath=${resolve(process.env.EXT_PATH ?? "vscode")}`,
     `--extensionTestsPath=${resolve("test/vscode/suite.cjs")}`,
     `--user-data-dir=${join(tmp, "user")}`,
     `--extensions-dir=${join(tmp, "extensions")}`,

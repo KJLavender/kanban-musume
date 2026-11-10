@@ -5,6 +5,11 @@
   "version": "0.1.0",
   "publisher": "KJLavender",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KJLavender/acp-pet.git",
+    "directory": "vscode"
+  },
   "private": true,
   "type": "module",
   "engines": {
@@ -28,19 +33,53 @@
       ]
     },
     "commands": [
-      { "command": "acpPet.feed", "title": "餵任務給寵物 (Give the pet a task)", "category": "ACP Pet" },
-      { "command": "acpPet.cancel", "title": "取消目前任務 (Cancel the task)", "category": "ACP Pet" },
-      { "command": "acpPet.next", "title": "換下一個角色 (Next character)", "category": "ACP Pet" },
-      { "command": "acpPet.pick", "title": "選擇角色… (Pick a character)", "category": "ACP Pet" }
+      {
+        "command": "acpPet.feed",
+        "title": "餵任務給寵物 (Give the pet a task)",
+        "category": "ACP Pet"
+      },
+      {
+        "command": "acpPet.cancel",
+        "title": "取消目前任務 (Cancel the task)",
+        "category": "ACP Pet"
+      },
+      {
+        "command": "acpPet.next",
+        "title": "換下一個角色 (Next character)",
+        "category": "ACP Pet"
+      },
+      {
+        "command": "acpPet.pick",
+        "title": "選擇角色… (Pick a character)",
+        "category": "ACP Pet"
+      },
+      {
+        "command": "acpPet.overlay.install",
+        "title": "把角色放進編輯器 (Put the character in the editor)",
+        "category": "ACP Pet"
+      },
+      {
+        "command": "acpPet.overlay.remove",
+        "title": "把角色從編輯器移除 (Remove the character from the editor)",
+        "category": "ACP Pet"
+      }
     ],
     "configuration": {
       "title": "ACP Pet",
       "properties": {
         "acpPet.characters": {
           "type": "array",
-          "items": { "type": "string" },
-          "default": ["hikari", "nozomi", "deepseek", "flandre", "remilia"],
-          "description": "Skin ids that take turns. Bundled: hikari, nozomi, deepseek, flandre, remilia, their -pixel versions, and the chicks (chick, snow, mint, sakura, night). Folders in ~/.acp-pet/skins work too."
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "deepseek",
+            "flandre",
+            "remilia",
+            "hikari-art",
+            "nozomi-art"
+          ],
+          "description": "Characters that take turns, in order. Picture skins: bundled deepseek, flandre, remilia, and folders in ~/.acp-pet/skins (such as hikari-art, nozomi-art). Ones that aren't installed are skipped."
         },
         "acpPet.rotateMinutes": {
           "type": "number",
@@ -63,8 +102,25 @@
           "default": 60,
           "minimum": 5,
           "description": "Seconds before an unanswered permission sign counts as Deny."
+        },
+        "acpPet.editor.backgroundOpacity": {
+          "type": "number",
+          "default": 0.12,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "How strongly the character's background illustration (~/.acp-pet/backgrounds/<id>.jpg) shows over the editor. 0 hides it."
+        },
+        "acpPet.editor.height": {
+          "type": "number",
+          "default": 220,
+          "minimum": 80,
+          "maximum": 600,
+          "description": "Height of the character in the editor, in pixels."
         }
       }
     }
+  },
+  "dependencies": {
+    "acpx": "0.19.4"
   }
 }

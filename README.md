@@ -158,11 +158,24 @@ code --extensionDevelopmentPath="$PWD/vscode"
 
 That opens a second VS Code window with the extension loaded. Settings (search for `acpPet`):
 
-- `acpPet.characters`: which skins take turns, in order. Default: `hikari`, `nozomi`, `deepseek`, `flandre`, `remilia`. Folders in `~/.acp-pet/skins` work too.
+- `acpPet.characters`: which characters take turns, in order. Default: `deepseek`, `flandre`, `remilia`, `hikari-art`, `nozomi-art`. Ones that aren't installed are skipped.
 - `acpPet.rotateMinutes`: minutes between switches. `0` keeps the current character.
 - `acpPet.agent`: the acpx agent for tasks, `claude` by default. After changing it, reload the window.
 - `acpPet.reactToEditor`: turn off the reactions to your own editing.
 - `acpPet.permissionTimeoutSec`: seconds before an unanswered sign counts as Deny.
+
+### The character in the editor
+
+Like [doki-theme](https://github.com/doki-theme/doki-theme-vscode), the extension can also put the character right in the editor: she stands in the bottom-right corner over a faded background illustration. Run "ACP Pet: 把角色放進編輯器" from the Command Palette and reload the window.
+
+- She breathes, types along while you type, and reacts when you click her (pat her head, poke her cheek; five clicks in a few seconds and she sulks).
+- Drag her anywhere; she remembers the spot. Right-click her for the next character.
+- She falls asleep after 10 minutes without keyboard or mouse, and wakes up when you come back. Now and then she mumbles to herself.
+- Every few minutes (`acpPet.rotateMinutes`) the next character takes over, and the background changes with her.
+
+Only picture characters are used (the bundled DeepSeek-tan, Flandre and Remilia, and folders in `~/.acp-pet/skins` such as your own `hikari-art`). Backgrounds are read from `~/.acp-pet/backgrounds/<id>.jpg` (or `.png`, `.webp`) and are never copied into this repo. `acpPet.editor.backgroundOpacity` sets how strongly the background shows (default 0.12, 0 hides it) and `acpPet.editor.height` sets her size.
+
+This works by changing one of VS Code's own files (`workbench.html`): it adds one script line and a folder of pictures next to it, and updates the file's checksum in `product.json` so VS Code doesn't report a corrupt install. After a VS Code update the change is gone; the extension notices and offers to put it back. To undo it, run "ACP Pet: 把角色從編輯器移除" before uninstalling the extension.
 
 The VS Code pet keeps its own save file, `~/.acp-pet/vscode-save.json`, so its level is separate from the desktop pets.
 

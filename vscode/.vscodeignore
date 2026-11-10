@@ -1,0 +1,6 @@
+src/**
+build.mjs
+package.mjs
+**/*.map
+**/*.ts
+.gitignore

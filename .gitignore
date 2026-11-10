@@ -15,3 +15,7 @@ plans/
 vscode/dist/
 vscode/pets/
 .vscode-test/
+vscode/node_modules/
+vscode/*.vsix
+vscode/LICENSE
+vscode/ASSETS-LICENSE.md

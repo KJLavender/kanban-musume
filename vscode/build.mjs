@@ -22,6 +22,16 @@ await Promise.all([
   }),
   build({
     ...common,
+    // Runs inside VS Code's own window once the overlay is installed.
+    entryPoints: ["vscode/src/overlay/overlay.ts"],
+    outfile: "vscode/dist/overlay.js",
+    platform: "browser",
+    format: "iife",
+    target: "chrome120",
+    sourcemap: false,
+  }),
+  build({
+    ...common,
     entryPoints: ["vscode/src/webview/main.ts"],
     outfile: "vscode/dist/webview/main.js",
     platform: "browser",

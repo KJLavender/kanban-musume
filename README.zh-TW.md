@@ -158,11 +158,24 @@ code --extensionDevelopmentPath="$PWD/vscode"
 
 這會另外開一個載入了擴充套件的 VS Code 視窗。設定(搜尋 `acpPet`):
 
-- `acpPet.characters`:輪流上場的外表,照順序。預設是 `hikari`、`nozomi`、`deepseek`、`flandre`、`remilia`。`~/.acp-pet/skins` 裡的資料夾也可以用。
+- `acpPet.characters`:輪流上場的角色,照順序。預設是 `deepseek`、`flandre`、`remilia`、`hikari-art`、`nozomi-art`。沒安裝的會自動跳過。
 - `acpPet.rotateMinutes`:幾分鐘換一次。`0` 代表不換。
 - `acpPet.agent`:跑任務的 acpx agent,預設 `claude`。改了之後要重新載入視窗。
 - `acpPet.reactToEditor`:關掉對你自己編輯動作的反應。
 - `acpPet.permissionTimeoutSec`:權限牌幾秒沒回應就當作「不准」。
+
+### 編輯器裡的角色
+
+跟 [doki-theme](https://github.com/doki-theme/doki-theme-vscode) 一樣,擴充套件也可以把角色直接放進編輯器:她站在右下角,後面是淡淡的背景插畫。在指令面板執行「ACP Pet: 把角色放進編輯器」,再重新載入視窗。
+
+- 她會呼吸晃動,你打字時跟著打字,點她會有反應(摸頭、戳臉頰;幾秒內連點五下會生氣)。
+- 可以把她拖到任何地方,她會記住位置。在她身上按右鍵換下一個角色。
+- 10 分鐘沒碰鍵盤滑鼠她會睡著,你回來就會醒。偶爾會自言自語。
+- 每隔幾分鐘(`acpPet.rotateMinutes`)換下一個角色,背景也跟著換。
+
+只會用圖片角色(內附的 DeepSeek娘、芙蘭朵露、蕾米莉亞,以及 `~/.acp-pet/skins` 裡的資料夾,例如你自己的 `hikari-art`)。背景圖從 `~/.acp-pet/backgrounds/<id>.jpg`(或 `.png`、`.webp`)讀取,不會被放進這個 repo。`acpPet.editor.backgroundOpacity` 調背景的明顯程度(預設 0.12,0 就是不顯示),`acpPet.editor.height` 調角色大小。
+
+做法是改 VS Code 自己的一個檔案(`workbench.html`):加一行 script 和旁邊一個放圖片的資料夾,並更新 `product.json` 裡這個檔案的檢查碼,這樣 VS Code 就不會說安裝已損毀。VS Code 更新後這個修改會消失,擴充套件會發現並問你要不要放回去。想還原,請在解除安裝擴充套件之前執行「ACP Pet: 把角色從編輯器移除」。
 
 VS Code 版的寵物有自己的存檔 `~/.acp-pet/vscode-save.json`,等級跟桌面版的寵物分開算。
 
