@@ -232,7 +232,7 @@ acpx runtime ─ AcpRuntimeEvent ─▶ AcpEventNormalizer ─ PetEvent ─▶ P
 ```bash
 npm test          # 單元與整合測試
 npm run smoke     # 啟動真正的 Electron 程式並跑約 30 項檢查,截圖放在 smoke-out/
-npm run vscode:test   # 用你裝好的 VS Code、搭配用完即丟的設定檔開啟擴充套件,檢查面板、換角色、打字反應和一次 /demo 任務
+npm run vscode:test   # 第一次會另外下載一份 VS Code 到 .vscode-test/,用用完即丟的設定檔開啟擴充套件,檢查面板、換角色、打字反應和一次 /demo 任務
 ACP_PET_LIVE=1 npx vitest run test/live.test.ts   # 在暫存資料夾驅動真的 agent:一個 turn 加一次兩步的接力(會用掉 agent 額度)
 ```
 

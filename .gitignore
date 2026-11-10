@@ -14,3 +14,4 @@ plan.md
 plans/
 vscode/dist/
 vscode/pets/
+.vscode-test/

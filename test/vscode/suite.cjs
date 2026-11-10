@@ -46,6 +46,12 @@ exports.run = async () => {
     assert.strictEqual(api.lastSnapshot().state, "typing");
   });
 
+  await check("acpx (loaded on the first real task) resolves from the built extension", () => {
+    const { createRequire } = require("node:module");
+    const req = createRequire(join(ext.extensionPath, "dist", "extension.cjs"));
+    assert.ok(req.resolve("acpx/runtime"));
+  });
+
   await check("a scripted /demo task runs through the permission sign", async () => {
     const auto = setInterval(() => {
       const p = api.controller.brain.snapshot().permission;

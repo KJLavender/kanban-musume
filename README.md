@@ -232,7 +232,7 @@ acpx runtime ─ AcpRuntimeEvent ─▶ AcpEventNormalizer ─ PetEvent ─▶ P
 ```bash
 npm test          # unit and integration tests
 npm run smoke     # starts the real Electron app and runs about 30 checks; screenshots go to smoke-out/
-npm run vscode:test   # opens the extension in your installed VS Code with a throwaway profile and checks the panel, rotation, typing and a /demo task
+npm run vscode:test   # downloads a separate VS Code once (into .vscode-test/), opens the extension with a throwaway profile, and checks the panel, rotation, typing and a /demo task
 ACP_PET_LIVE=1 npx vitest run test/live.test.ts   # drives a real agent in a temp folder: one turn and a two-step relay (uses your agent quota)
 ```
 
