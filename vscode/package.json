@@ -80,7 +80,7 @@
             "hikari-art",
             "nozomi-art"
           ],
-          "description": "Characters that take turns, in order. Picture skins: bundled deepseek, flandre, remilia, and folders in ~/.acp-pet/skins (such as hikari-art, nozomi-art). Ones that aren't installed are skipped."
+          "description": "Characters that take turns, in order. Bundled: deepseek, flandre, remilia, hikari-art, nozomi-art. Picture folders you add to ~/.acp-pet/skins work too; ones that aren't installed are skipped."
         },
         "acpPet.rotateMinutes": {
           "type": "number",
@@ -109,7 +109,7 @@
           "default": 0.12,
           "minimum": 0,
           "maximum": 1,
-          "description": "How strongly the character's background illustration (~/.acp-pet/backgrounds/<id>.png) shows over the editor. 0 hides it."
+          "description": "How strongly the character's background illustration shows over the editor (0 hides it). Each character brings her own; ~/.acp-pet/backgrounds/<id>.png overrides it."
         },
         "acpPet.editor.height": {
           "type": "number",
