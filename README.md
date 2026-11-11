@@ -201,13 +201,13 @@ The VS Code pet keeps its own save file, `~/.acp-pet/vscode-save.json`, so its l
 
 ## In Orca
 
-[Orca](https://orca.build) has a pet of its own in the status bar that reacts to your agents' status (working, waiting for you, done, failed). It can load these characters too:
+[Orca](https://orca.build) has a pet of its own in the status bar that reacts to your agents' status (working, waiting for you, done, failed). It can load these characters too. Download `orca-<character>.zip` from [Releases](https://github.com/KJLavender/kanban-musume/releases/latest) and unzip it, or build them yourself:
 
 ```bash
 python scripts/pets/make_orca_bundle.py      # writes dist-orca/<id>/ for every picture character
 ```
 
-Then in Orca, import a pet bundle from its pet menu in the status bar and pick `dist-orca/<id>/pet.json`. Each bundle turns the character's poses into Orca's animations (idle, walking, waving, jumping, failed, waiting, working, review) at 320x400 per frame. Orca's pet has no background illustration and doesn't take turns between characters; switch pets in its menu.
+Then in Orca, import a pet bundle from its pet menu in the status bar and pick the `pet.json`. Orca's pet only shows in the desktop app, not in Orca Mobile. Each bundle turns the character's poses into Orca's animations (idle, walking, waving, jumping, failed, waiting, working, review) at 320x400 per frame. Orca's pet has no background illustration and doesn't take turns between characters; switch pets in its menu.
 
 ## Configuration
 
