@@ -19,3 +19,4 @@ vscode/node_modules/
 vscode/*.vsix
 vscode/LICENSE
 vscode/ASSETS-LICENSE.md
+dist-orca/

@@ -199,6 +199,16 @@ code --extensionDevelopmentPath="$PWD/vscode"
 
 VS Code 版的寵物有自己的存檔 `~/.acp-pet/vscode-save.json`,等級跟桌面版的寵物分開算。
 
+## 在 Orca 裡
+
+[Orca](https://orca.build) 狀態列有自己的寵物,會依 agent 的狀態(工作中、等你回覆、完成、失敗)做出反應。它也能載入這些角色:
+
+```bash
+python scripts/pets/make_orca_bundle.py      # 為每個圖片角色產生 dist-orca/<id>/
+```
+
+接著在 Orca 狀態列的寵物選單匯入寵物包(pet bundle),選 `dist-orca/<id>/pet.json`。每個寵物包會把角色的動作轉成 Orca 的動畫(待機、走路、揮手、跳、失敗、等待、工作中、檢查),每格 320x400。Orca 的寵物沒有背景插畫,也不會自動輪替角色,要在它的選單裡換。
+
 ## 設定
 
 第一次啟動時,程式會寫出 `~/.acp-pet/config.json`:

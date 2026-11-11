@@ -199,6 +199,16 @@ This works by changing one of VS Code's own files (`workbench.html`): it adds on
 
 The VS Code pet keeps its own save file, `~/.acp-pet/vscode-save.json`, so its level is separate from the desktop pets.
 
+## In Orca
+
+[Orca](https://orca.build) has a pet of its own in the status bar that reacts to your agents' status (working, waiting for you, done, failed). It can load these characters too:
+
+```bash
+python scripts/pets/make_orca_bundle.py      # writes dist-orca/<id>/ for every picture character
+```
+
+Then in Orca, import a pet bundle from its pet menu in the status bar and pick `dist-orca/<id>/pet.json`. Each bundle turns the character's poses into Orca's animations (idle, walking, waving, jumping, failed, waiting, working, review) at 320x400 per frame. Orca's pet has no background illustration and doesn't take turns between characters; switch pets in its menu.
+
 ## Configuration
 
 On first launch the app writes `~/.acp-pet/config.json`:
